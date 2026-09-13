@@ -1,0 +1,22 @@
+{
+  "name": "scanmenu",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ScanMenu — QR-code digital menu platform (customer app + admin panel + Supabase).",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:customer": "npm run dev --workspace=apps/customer",
+    "dev:chino": "npm run dev --workspace=apps/customer-chino",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build:customer": "npm run build --workspace=apps/customer",
+    "build:chino": "npm run build --workspace=apps/customer-chino",
+    "build:admin": "npm run build --workspace=apps/admin",
+    "supabase:migrate": "supabase db push"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

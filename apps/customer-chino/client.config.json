@@ -1,0 +1,15 @@
+{
+  "restaurantSlug": "chino-cafe",
+  "theme": {
+    "background": "#1a1713",
+    "surface": "#242019",
+    "surfaceCard": "#e9dfcd",
+    "textOnDark": "#f2efe8",
+    "nameColor": "#ece4d0",
+    "priceColor": "#42c07f",
+    "accent": "#2f8a58",
+    "danger": "#d1503f",
+    "fontDisplay": "Sora",
+    "fontBody": "Manrope"
+  }
+}

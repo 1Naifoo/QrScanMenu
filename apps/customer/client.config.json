@@ -1,0 +1,15 @@
+{
+  "restaurantSlug": "olive-garden-grill",
+  "theme": {
+    "background": "#1c1712",
+    "surface": "#2a231c",
+    "surfaceCard": "#f4efe4",
+    "textOnDark": "#f2ede2",
+    "nameColor": "#f2c94c",
+    "priceColor": "#6fcf97",
+    "accent": "#e8923f",
+    "danger": "#e2574c",
+    "fontDisplay": "Sora",
+    "fontBody": "Manrope"
+  }
+}

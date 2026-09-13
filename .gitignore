@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Env files — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+.vercel/
+.netlify/
+
+# Generated per-build data (regenerated from Supabase each build — see
+# scripts/generate-static.js in each customer app). Never hand-edit or
+# commit — covers every client's duplicated customer app, not just one.
+apps/*/public/menu.json
+apps/*/public/theme.json
+
+# Supabase local dev
+supabase/.branches
+supabase/.temp
+
+# Editor / OS
+.DS_Store
+.vscode/
+*.log

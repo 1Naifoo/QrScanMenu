@@ -1,0 +1,16 @@
+{
+  "name": "@scanmenu/customer-chino",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chino cafe's customer-facing QR menu — a duplicated copy of apps/customer for this client, per the multi-tenant template pattern (see root README).",
+  "scripts": {
+    "build:data": "node scripts/generate-static.js",
+    "dev": "vite",
+    "build": "npm run build:data && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

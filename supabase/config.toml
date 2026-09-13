@@ -1,0 +1,17 @@
+# Supabase local development config.
+# Run `supabase init` once you have the Supabase CLI installed to generate
+# the full version of this file — this is a minimal placeholder so the
+# folder structure and workflow are in place before real schema work starts.
+
+project_id = "scanmenu"
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[auth]
+enabled = true
+# Admin panel uses email/password sign-in only — no public sign-up flow.
+enable_signup = false

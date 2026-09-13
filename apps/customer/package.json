@@ -1,0 +1,16 @@
+{
+  "name": "@scanmenu/customer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Customer-facing QR menu — fully static at runtime, no login, no live database calls. One copy of this folder = one client's own repo.",
+  "scripts": {
+    "build:data": "node scripts/generate-static.js",
+    "dev": "vite",
+    "build": "npm run build:data && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
