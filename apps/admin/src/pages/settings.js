@@ -24,6 +24,13 @@ const THEME_FIELDS = [
 ];
 const THEME_FALLBACK = "#808080";
 
+function featuredSummary(items, selectedIds) {
+  if (selectedIds.length === 0) return "None (auto-pick)";
+  const names = selectedIds.map((id) => items.find((i) => i.id === id)?.name).filter(Boolean);
+  if (names.length > 2) return `${names.length} items selected`;
+  return names.join(", ");
+}
+
 export async function renderSettings(container, { supabase, session, onSignOut, onNavItems }) {
   container.innerHTML = `<div class="workspace-loading">Loading settings…</div>`;
 
@@ -160,24 +167,32 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
             <div class="field">
               <label>Featured items</label>
-              <div class="featured-item-checklist">
-                ${
-                  items.length === 0
-                    ? `<p class="field-hint">Add a menu item first, then feature it here.</p>`
-                    : items
-                        .map(
-                          (i) => `
-                    <label class="featured-item-option">
-                      <input type="checkbox" class="featured-item-checkbox" value="${i.id}" ${
-                            (restaurant.featured_item_ids || []).includes(i.id) ? "checked" : ""
-                          } />
-                      ${i.name}
-                    </label>
-                  `
-                        )
-                        .join("")
-                }
-              </div>
+              ${
+                items.length === 0
+                  ? `<p class="field-hint">Add a menu item first, then feature it here.</p>`
+                  : `
+                <details class="category-dropdown" id="featured-item-dropdown">
+                  <summary class="category-dropdown-toggle">
+                    <span id="featured-item-summary">${featuredSummary(items, restaurant.featured_item_ids || [])}</span>
+                    <span class="dropdown-chevron">⌄</span>
+                  </summary>
+                  <div class="category-dropdown-menu featured-item-menu">
+                    ${items
+                      .map(
+                        (i) => `
+                      <label class="featured-item-option">
+                        <input type="checkbox" class="featured-item-checkbox" value="${i.id}" ${
+                          (restaurant.featured_item_ids || []).includes(i.id) ? "checked" : ""
+                        } />
+                        ${i.name}
+                      </label>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </details>
+              `
+              }
               <p class="field-hint">Shown in the "See what's inside" section on your customer site's home screen. Leave all unchecked to auto-pick one.</p>
             </div>
 
@@ -274,6 +289,13 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     THEME_FIELDS.forEach((field) => {
       container.querySelector(`#theme-${field.key}`).addEventListener("input", (e) => {
         e.target.dataset.touched = "true";
+      });
+    });
+
+    container.querySelectorAll(".featured-item-checkbox").forEach((box) => {
+      box.addEventListener("change", () => {
+        const selectedIds = [...container.querySelectorAll(".featured-item-checkbox:checked")].map((el) => el.value);
+        container.querySelector("#featured-item-summary").textContent = featuredSummary(items, selectedIds);
       });
     });
 
