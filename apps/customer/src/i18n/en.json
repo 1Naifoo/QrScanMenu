@@ -3,7 +3,7 @@
   "menu.featuredEyebrow": "See what's inside",
   "itemCard.add": "Add",
   "dish.descriptionLabel": "Description",
-  "dish.caloriesLabel": "Calories",
+  "dish.caloriesUnit": "cal",
   "dish.allergiesLabel": "Allergies",
   "dish.spicy": "Spicy",
   "dish.optionRequired": "Please choose one.",

@@ -474,19 +474,6 @@ button {
   line-height: 1.6;
 }
 
-.dish-meta {
-  color: var(--c-text-on-dark);
-  opacity: 0.85;
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 10px 0 0;
-}
-
-.dish-meta strong {
-  opacity: 0.7;
-  font-weight: 600;
-}
-
 .spicy-badge {
   display: inline-flex;
   flex-direction: column;
@@ -542,6 +529,12 @@ button {
   color: #1c1712;
 }
 
+.option-choice-static {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
 .option-group-error {
   margin: 8px 0 0;
   font-size: 12px;
@@ -558,10 +551,22 @@ button {
   bottom: 0;
 }
 
+.dish-price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .dish-price {
   color: var(--c-price);
   font-weight: 700;
   font-size: 15px;
+}
+
+.dish-calories {
+  font-size: 11px;
+  color: var(--c-text-on-dark);
+  opacity: 0.6;
 }
 
 .quantity-stepper {

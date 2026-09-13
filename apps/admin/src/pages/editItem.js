@@ -68,7 +68,8 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
 
         <div class="field">
           <label for="item-allergies">Allergies (English)</label>
-          <input type="text" id="item-allergies" placeholder="Contains nuts, dairy" value="${item?.allergies ?? ""}" />
+          <input type="text" id="item-allergies" placeholder="Nuts, Dairy, Gluten" value="${item?.allergies ?? ""}" />
+          <p class="field-hint">Comma-separated — shown on the customer site as a row of tags.</p>
         </div>
 
         <div class="field">

@@ -39,6 +39,10 @@ export function renderDishDetail(
 
   let quantity = initialQuantity;
   const selectedOptions = { ...initialOptions };
+  const allergiesText = localize(item.allergies, item.allergies_ar);
+  const allergiesList = allergiesText
+    ? allergiesText.split(",").map((a) => a.trim()).filter(Boolean)
+    : [];
 
   container.innerHTML = `
     <div class="dish-detail">
@@ -62,10 +66,16 @@ export function renderDishDetail(
             : ""
         }
 
-        ${item.calories ? `<p class="dish-meta"><strong>${t("dish.caloriesLabel")}:</strong> ${item.calories}</p>` : ""}
         ${
-          localize(item.allergies, item.allergies_ar)
-            ? `<p class="dish-meta"><strong>${t("dish.allergiesLabel")}:</strong> ${localize(item.allergies, item.allergies_ar)}</p>`
+          allergiesList.length > 0
+            ? `
+          <div class="option-group">
+            <p class="dish-section-label">${t("dish.allergiesLabel")}</p>
+            <div class="option-choices">
+              ${allergiesList.map((a) => `<span class="option-choice option-choice-static">${a}</span>`).join("")}
+            </div>
+          </div>
+        `
             : ""
         }
 
@@ -95,7 +105,10 @@ export function renderDishDetail(
       </div>
 
       <div class="dish-footer">
-        <span class="dish-price">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</span>
+        <div class="dish-price-group">
+          <span class="dish-price">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</span>
+          ${item.calories ? `<span class="dish-calories">${item.calories} ${t("dish.caloriesUnit")}</span>` : ""}
+        </div>
         <div class="quantity-stepper">
           <button id="qty-minus" aria-label="${t("dish.decreaseQty")}">−</button>
           <span id="qty-value">${quantity}</span>
