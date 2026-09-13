@@ -295,7 +295,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--c-accent);
+  color: #000;
   margin: 0 0 10px;
 }
 
@@ -416,19 +416,19 @@ button {
   flex-direction: column;
 }
 
+.dish-detail-header {
+  padding: 16px 16px 0;
+}
+
 .back-button {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
+  background: var(--c-surface);
+  color: var(--c-text-on-dark);
   border: none;
   border-radius: 50%;
   width: 36px;
   height: 36px;
   font-size: 22px;
   cursor: pointer;
-  z-index: 2;
 }
 
 .dish-photo {
@@ -451,11 +451,18 @@ button {
   flex: 1;
 }
 
+.dish-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
 .dish-name {
   font-family: var(--font-display);
   color: var(--c-name);
   font-size: 22px;
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 .dish-section-label {
@@ -549,12 +556,6 @@ button {
   background: var(--c-surface);
   position: sticky;
   bottom: 0;
-}
-
-.dish-price-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .dish-price {

@@ -46,14 +46,19 @@ export function renderDishDetail(
 
   container.innerHTML = `
     <div class="dish-detail">
-      <button class="back-button" id="back-button" aria-label="${t("dish.back")}">‹</button>
+      <div class="dish-detail-header">
+        <button class="back-button" id="back-button" aria-label="${t("dish.back")}">‹</button>
+      </div>
 
       <div class="dish-photo">
         ${item.photo_url ? `<img src="${item.photo_url}" alt="${item.name}" />` : ""}
       </div>
 
       <div class="dish-body">
-        <h1 class="dish-name">${localize(item.name, item.name_ar)}</h1>
+        <div class="dish-name-row">
+          <h1 class="dish-name">${localize(item.name, item.name_ar)}</h1>
+          ${item.calories ? `<span class="dish-calories">${item.calories} ${t("dish.caloriesUnit")}</span>` : ""}
+        </div>
         ${
           item.description
             ? `<p class="dish-section-label">${t("dish.descriptionLabel")}</p><p class="dish-description">${localize(item.description, item.description_ar)}</p>`
@@ -63,19 +68,6 @@ export function renderDishDetail(
         ${
           item.is_spicy
             ? `<div class="spicy-badge"><span class="spicy-badge-icon">🌶️</span><span class="spicy-badge-label">${t("dish.spicy")}</span></div>`
-            : ""
-        }
-
-        ${
-          allergiesList.length > 0
-            ? `
-          <div class="option-group">
-            <p class="dish-section-label">${t("dish.allergiesLabel")}</p>
-            <div class="option-choices">
-              ${allergiesList.map((a) => `<span class="option-choice option-choice-static">${a}</span>`).join("")}
-            </div>
-          </div>
-        `
             : ""
         }
 
@@ -102,13 +94,23 @@ export function renderDishDetail(
         `
           )
           .join("")}
+
+        ${
+          allergiesList.length > 0
+            ? `
+          <div class="option-group">
+            <p class="dish-section-label">${t("dish.allergiesLabel")}</p>
+            <div class="option-choices">
+              ${allergiesList.map((a) => `<span class="option-choice option-choice-static">${a}</span>`).join("")}
+            </div>
+          </div>
+        `
+            : ""
+        }
       </div>
 
       <div class="dish-footer">
-        <div class="dish-price-group">
-          <span class="dish-price">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</span>
-          ${item.calories ? `<span class="dish-calories">${item.calories} ${t("dish.caloriesUnit")}</span>` : ""}
-        </div>
+        <span class="dish-price">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</span>
         <div class="quantity-stepper">
           <button id="qty-minus" aria-label="${t("dish.decreaseQty")}">−</button>
           <span id="qty-value">${quantity}</span>
