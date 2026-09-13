@@ -323,7 +323,7 @@ button {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 16px;
-  color: #000;
+  color: var(--c-name);
   margin: 0 0 8px;
 }
 
@@ -331,7 +331,7 @@ button {
   margin: 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--c-text-on-dark);
+  color: #000;
   opacity: 0.85;
 }
 
