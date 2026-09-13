@@ -13,16 +13,16 @@ import { showToast } from "../components/toast.js";
 import { t, getLanguage, setLanguage } from "../i18n/index.js";
 
 const THEME_FIELDS = [
-  { key: "background", label: "Background" },
-  { key: "surface", label: "Surface (header, cards on dark)" },
-  { key: "surfaceCard", label: "Card surface (item cards, My List)" },
-  { key: "textOnDark", label: "Text on dark" },
-  { key: "nameColor", label: "Dish name" },
-  { key: "sectionHeader", label: "Section headers (category titles)" },
-  { key: "priceColor", label: "Price" },
-  { key: "accent", label: "Accent (buttons, active states)" },
-  { key: "danger", label: "Danger (spicy, delete)" },
-  { key: "featuredBg", label: "Featured card background" },
+  { key: "background", labelKey: "settings.themeBackground" },
+  { key: "surface", labelKey: "settings.themeSurface" },
+  { key: "surfaceCard", labelKey: "settings.themeSurfaceCard" },
+  { key: "textOnDark", labelKey: "settings.themeTextOnDark" },
+  { key: "nameColor", labelKey: "settings.themeNameColor" },
+  { key: "sectionHeader", labelKey: "settings.themeSectionHeader" },
+  { key: "priceColor", labelKey: "settings.themePriceColor" },
+  { key: "accent", labelKey: "settings.themeAccent" },
+  { key: "danger", labelKey: "settings.themeDanger" },
+  { key: "featuredBg", labelKey: "settings.themeFeaturedBg" },
 ];
 const THEME_FALLBACK = "#808080";
 
@@ -146,9 +146,15 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
         </aside>
 
         <main class="admin-main">
-          <div class="settings-panel">
+          <div class="settings-header">
             <h1 class="settings-heading">${t("settings.heading")}</h1>
+            <button class="publish-button" id="publish">${t("menuItems.publish")}</button>
+          </div>
 
+          <div class="publish-status" id="publish-status" hidden></div>
+
+          <div class="settings-grid">
+          <div class="settings-panel">
             <div class="field" id="logo-field"></div>
 
             <div class="field">
@@ -211,23 +217,18 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
             <div class="settings-status" id="settings-status" hidden></div>
 
-            <div class="settings-panel-actions">
-              <button class="primary-button" id="save-settings">${t("settings.save")}</button>
-              <button class="publish-button" id="publish">${t("menuItems.publish")}</button>
-            </div>
-
-            <div class="publish-status" id="publish-status" hidden></div>
+            <button class="primary-button" id="save-settings">${t("settings.save")}</button>
           </div>
 
           <div class="settings-panel">
-            <h2 class="settings-subheading">Customer site theme</h2>
-            <p class="field-hint">Overrides your site's built-in colors. Leave a color as-is to keep the template default.</p>
+            <h2 class="settings-subheading">${t("settings.themeHeading")}</h2>
+            <p class="field-hint">${t("settings.themeHint")}</p>
 
             <div class="theme-field-grid">
               ${THEME_FIELDS.map(
                 (field) => `
                 <div class="theme-field">
-                  <label for="theme-${field.key}">${field.label}</label>
+                  <label for="theme-${field.key}">${t(field.labelKey)}</label>
                   <input
                     type="color"
                     id="theme-${field.key}"
@@ -241,7 +242,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
             <div class="settings-status" id="theme-status" hidden></div>
 
-            <button class="primary-button" id="save-theme">Save Theme</button>
+            <button class="primary-button" id="save-theme">${t("settings.saveTheme")}</button>
           </div>
 
           <div class="settings-panel">
@@ -285,6 +286,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
               <button class="secondary-button" id="add-category">${t("menuItems.addCategory")}</button>
               ${categories.length > 0 ? `<button class="primary-button" id="save-categories">Save Categories</button>` : ""}
             </div>
+          </div>
           </div>
         </main>
       </div>

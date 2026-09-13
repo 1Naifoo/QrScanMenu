@@ -29,5 +29,18 @@
   "settings.categoriesHint": "Both an English and Arabic name are required for each category, so the customer site's language toggle always has something to switch to.",
   "settings.categoryNameEn": "English name",
   "settings.categoryNameAr": "Arabic name",
-  "settings.noCategories": "No categories yet."
+  "settings.noCategories": "No categories yet.",
+  "settings.themeHeading": "Customer site theme",
+  "settings.themeHint": "Overrides your site's built-in colors. Leave a color as-is to keep the template default.",
+  "settings.saveTheme": "Save Theme",
+  "settings.themeBackground": "Background",
+  "settings.themeSurface": "Header & Cards",
+  "settings.themeSurfaceCard": "Item Cards",
+  "settings.themeTextOnDark": "Text Color",
+  "settings.themeNameColor": "Dish Names",
+  "settings.themeSectionHeader": "Category Titles",
+  "settings.themePriceColor": "Price",
+  "settings.themeAccent": "Buttons",
+  "settings.themeDanger": "Warnings",
+  "settings.themeFeaturedBg": "Featured Card"
 }

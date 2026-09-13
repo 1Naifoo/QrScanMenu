@@ -29,5 +29,18 @@
   "settings.categoriesHint": "الاسم الإنجليزي والاسم العربي مطلوبان لكل فئة، حتى يكون لدى مبدّل اللغة في موقع العملاء ما يبدّل إليه دائمًا.",
   "settings.categoryNameEn": "الاسم الإنجليزي",
   "settings.categoryNameAr": "الاسم العربي",
-  "settings.noCategories": "لا توجد فئات بعد."
+  "settings.noCategories": "لا توجد فئات بعد.",
+  "settings.themeHeading": "مظهر موقع العملاء",
+  "settings.themeHint": "يتجاوز هذا الألوان الافتراضية لموقعك. اترك اللون كما هو للاحتفاظ بإعداد القالب الافتراضي.",
+  "settings.saveTheme": "حفظ المظهر",
+  "settings.themeBackground": "الخلفية",
+  "settings.themeSurface": "الرأس والبطاقات",
+  "settings.themeSurfaceCard": "بطاقات العناصر",
+  "settings.themeTextOnDark": "لون النص",
+  "settings.themeNameColor": "أسماء الأطباق",
+  "settings.themeSectionHeader": "عناوين الفئات",
+  "settings.themePriceColor": "السعر",
+  "settings.themeAccent": "الأزرار",
+  "settings.themeDanger": "التحذيرات",
+  "settings.themeFeaturedBg": "البطاقة المميزة"
 }

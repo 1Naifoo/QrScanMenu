@@ -153,6 +153,7 @@ button {
   justify-content: space-between;
   padding: 14px 16px;
   background: var(--c-surface);
+  border-radius: 0 0 20px 20px;
 }
 
 .lang-switch {
@@ -295,7 +296,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fff;
+  color: #000;
   margin: 0 0 10px;
 }
 
