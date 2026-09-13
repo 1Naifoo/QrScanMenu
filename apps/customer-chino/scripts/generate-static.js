@@ -43,7 +43,7 @@ async function main() {
 
   const { data: restaurant, error: restaurantError } = await supabase
     .from("restaurants")
-    .select("id, name, slug, logo_url, language_default")
+    .select("id, name, slug, logo_url, language_default, theme, featured_item_id")
     .eq("slug", slug)
     .single();
 
@@ -77,19 +77,22 @@ async function main() {
       slug: restaurant.slug,
       logoUrl: restaurant.logo_url,
       languageDefault: restaurant.language_default,
+      featuredItemId: restaurant.featured_item_id,
     },
     categories: categories || [],
     items: items || [],
     generatedAt: new Date().toISOString(),
   };
 
+  // DB-stored theme values (set via admin Settings) override the file's
+  // defaults per-key — an admin who hasn't customized anything yet still
+  // gets client.config.json's original colors untouched.
+  const theme = { ...clientConfig.theme, ...(restaurant.theme || {}) };
+
   const publicDir = path.join(rootDir, "public");
   mkdirSync(publicDir, { recursive: true });
   writeFileSync(path.join(publicDir, "menu.json"), JSON.stringify(menu, null, 2));
-  writeFileSync(
-    path.join(publicDir, "theme.json"),
-    JSON.stringify(clientConfig.theme, null, 2)
-  );
+  writeFileSync(path.join(publicDir, "theme.json"), JSON.stringify(theme, null, 2));
 
   console.log(`Generated public/menu.json and public/theme.json for "${restaurant.name}".`);
   console.log(`  ${(items || []).length} items across ${(categories || []).length} categories.`);

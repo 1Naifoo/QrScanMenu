@@ -16,7 +16,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
 
   const { data: memberships, error: membershipError } = await supabase
     .from("restaurant_admins")
-    .select("restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url)")
+    .select("restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url, site_url)")
     .eq("user_id", session.user.id);
 
   function renderDeadEnd(message) {
@@ -103,6 +103,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
             <span>ScanMenu <strong>Admin</strong></span>
           </div>
           ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${restaurant.logo_url}" alt="${restaurant.name}" /></div>` : ""}
+          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${restaurant.site_url}" target="_blank" rel="noopener">↗ View site</a>` : ""}
           <div class="restaurant-switcher">
             <label for="restaurant-select">${t("sidebar.restaurant")}</label>
             <select id="restaurant-select">

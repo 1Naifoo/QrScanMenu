@@ -9,12 +9,13 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
     categories.map((c) => [c.id, items.filter((i) => i.category_id === c.id)])
   );
 
-  // Highlight one dish's ingredients on the home screen as a teaser — the
-  // first available item (in menu order) that has both a photo and an
-  // ingredients list set, since there's no separate "featured" flag.
-  const featuredItem = items.find(
-    (i) => i.is_available && i.photo_url && i.ingredients?.length > 0
-  );
+  // Highlight one dish's ingredients on the home screen as a teaser —
+  // whichever item the admin explicitly chose (Settings), or if none is
+  // set yet, fall back to the first available item with a photo and an
+  // ingredients list so the card isn't just empty by default.
+  const featuredItem =
+    items.find((i) => i.id === restaurant.featuredItemId && i.is_available) ??
+    items.find((i) => i.is_available && i.photo_url && i.ingredients?.length > 0);
 
   let observer = null;
 

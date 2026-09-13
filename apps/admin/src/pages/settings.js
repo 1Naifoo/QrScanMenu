@@ -1,21 +1,37 @@
 // Settings — per-restaurant details an admin can manage directly, instead
-// of needing the template owner to run SQL: display name, logo, and the
-// deploy webhook Publish Changes calls (see supabase/migrations for the
+// of needing the template owner to run SQL: display name, logo, site URL
+// + QR code, customer-site theme colors, featured item, and the deploy
+// webhook Publish Changes calls (see supabase/migrations for the
 // deploy_webhook_url column). The admin panel's own UI language is a
 // separate concern, controlled by the sidebar toggle (see ../i18n).
 
+import QRCode from "qrcode";
 import { cropImage } from "../components/cropModal.js";
 import { confirmModal } from "../components/confirmModal.js";
 import { promptModal } from "../components/promptModal.js";
 import { showToast } from "../components/toast.js";
 import { t, getLanguage, setLanguage } from "../i18n/index.js";
 
+const THEME_FIELDS = [
+  { key: "background", label: "Background" },
+  { key: "surface", label: "Surface (header, cards on dark)" },
+  { key: "surfaceCard", label: "Card surface (item cards, My List)" },
+  { key: "textOnDark", label: "Text on dark" },
+  { key: "nameColor", label: "Dish name" },
+  { key: "priceColor", label: "Price" },
+  { key: "accent", label: "Accent (buttons, active states)" },
+  { key: "danger", label: "Danger (spicy, delete)" },
+];
+const THEME_FALLBACK = "#808080";
+
 export async function renderSettings(container, { supabase, session, onSignOut, onNavItems }) {
   container.innerHTML = `<div class="workspace-loading">Loading settings…</div>`;
 
   const { data: memberships, error: membershipError } = await supabase
     .from("restaurant_admins")
-    .select("restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url)")
+    .select(
+      "restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url, site_url, theme, featured_item_id)"
+    )
     .eq("user_id", session.user.id);
 
   function renderDeadEnd(message) {
@@ -56,21 +72,31 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
   async function load() {
     const restaurant = restaurants.find((r) => r.id === state.restaurantId);
-    const { data: categories, error } = await supabase
-      .from("categories")
-      .select("id, name, name_ar, sort_order")
-      .eq("restaurant_id", state.restaurantId)
-      .order("sort_order");
+    const [
+      { data: categories, error: categoriesError },
+      { data: items, error: itemsError },
+    ] = await Promise.all([
+      supabase
+        .from("categories")
+        .select("id, name, name_ar, sort_order")
+        .eq("restaurant_id", state.restaurantId)
+        .order("sort_order"),
+      supabase
+        .from("items")
+        .select("id, name")
+        .eq("restaurant_id", state.restaurantId)
+        .order("sort_order"),
+    ]);
 
-    if (error) {
-      console.error("Failed to load categories:", error);
-      showToast("Couldn't load categories. Try refreshing the page.", { type: "error", duration: 4000 });
+    if (categoriesError || itemsError) {
+      console.error("Failed to load settings data:", categoriesError || itemsError);
+      showToast("Couldn't load some settings data. Try refreshing the page.", { type: "error", duration: 4000 });
     }
 
-    render(restaurant, categories || []);
+    render(restaurant, categories || [], items || []);
   }
 
-  function render(restaurant, categories) {
+  function render(restaurant, categories, items) {
     logoFile = null;
     logoRemoved = false;
     logoPreviewUrl = restaurant.logo_url || "";
@@ -83,6 +109,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
             <span>ScanMenu <strong>Admin</strong></span>
           </div>
           ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${restaurant.logo_url}" alt="${restaurant.name}" /></div>` : ""}
+          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${restaurant.site_url}" target="_blank" rel="noopener">↗ View site</a>` : ""}
           <div class="restaurant-switcher">
             <label for="restaurant-select">${t("sidebar.restaurant")}</label>
             <select id="restaurant-select">
@@ -121,6 +148,31 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
             </div>
 
             <div class="field">
+              <label for="site-url">Site URL</label>
+              <input
+                type="url"
+                id="site-url"
+                placeholder="https://chino-cafe.vercel.app"
+                value="${restaurant.site_url || ""}"
+              />
+              <p class="field-hint">Your live customer-facing site's URL. Powers the "View site" link above and the QR code below.</p>
+            </div>
+
+            <div class="field">
+              <label for="featured-item">Featured item</label>
+              <select id="featured-item">
+                <option value="">None (auto-pick)</option>
+                ${items
+                  .map(
+                    (i) =>
+                      `<option value="${i.id}" ${i.id === restaurant.featured_item_id ? "selected" : ""}>${i.name}</option>`
+                  )
+                  .join("")}
+              </select>
+              <p class="field-hint">Shown in the "See what's inside" card on your customer site's home screen.</p>
+            </div>
+
+            <div class="field">
               <label for="deploy-webhook">${t("settings.deployWebhook")}</label>
               <input
                 type="url"
@@ -137,6 +189,40 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
           </div>
 
           <div class="settings-panel">
+            <h2 class="settings-subheading">Customer site theme</h2>
+            <p class="field-hint">Overrides your site's built-in colors. Leave a color as-is to keep the template default.</p>
+
+            <div class="theme-field-grid">
+              ${THEME_FIELDS.map(
+                (field) => `
+                <div class="theme-field">
+                  <label for="theme-${field.key}">${field.label}</label>
+                  <input type="color" id="theme-${field.key}" value="${restaurant.theme?.[field.key] || THEME_FALLBACK}" />
+                </div>
+              `
+              ).join("")}
+            </div>
+
+            <div class="settings-status" id="theme-status" hidden></div>
+
+            <button class="primary-button" id="save-theme">Save Theme</button>
+          </div>
+
+          <div class="settings-panel">
+            <h2 class="settings-subheading">QR code</h2>
+            ${
+              restaurant.site_url
+                ? `
+              <div class="qr-code-panel">
+                <canvas id="qr-canvas"></canvas>
+                <button class="secondary-button" id="print-qr">Print QR Code</button>
+              </div>
+            `
+                : `<p class="field-hint">Set your Site URL above first, then a QR code pointing at it will appear here.</p>`
+            }
+          </div>
+
+          <div class="settings-panel">
             <h2 class="settings-subheading">${t("settings.categoriesHeading")}</h2>
             <p class="field-hint">${t("settings.categoriesHint")}</p>
 
@@ -147,20 +233,25 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 <div class="category-translate-row" data-id="${c.id}">
                   <input type="text" class="category-name-en" value="${c.name}" placeholder="${t("settings.categoryNameEn")}" />
                   <input type="text" class="category-name-ar" dir="rtl" value="${c.name_ar ?? ""}" placeholder="${t("settings.categoryNameAr")}" />
-                  <button type="button" class="secondary-button save-category-row">${t("settings.save")}</button>
                 </div>
               `
                 )
                 .join("") || `<p class="field-hint">${t("settings.noCategories")}</p>`}
             </div>
 
-            <button class="secondary-button" id="add-category">${t("menuItems.addCategory")}</button>
+            <div class="settings-status" id="categories-status" hidden></div>
+
+            <div class="settings-panel-actions">
+              <button class="secondary-button" id="add-category">${t("menuItems.addCategory")}</button>
+              ${categories.length > 0 ? `<button class="primary-button" id="save-categories">Save Categories</button>` : ""}
+            </div>
           </div>
         </main>
       </div>
     `;
 
     renderLogoField();
+    renderQrCode(restaurant);
 
     container.querySelector("#restaurant-select").addEventListener("change", (e) => {
       state.restaurantId = e.target.value;
@@ -171,38 +262,51 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       btn.addEventListener("click", () => {
         if (btn.dataset.lang === getLanguage()) return;
         setLanguage(btn.dataset.lang);
-        render(restaurant, categories);
+        render(restaurant, categories, items);
       });
     });
 
-    container.querySelectorAll(".save-category-row").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const row = btn.closest(".category-translate-row");
-        const id = row.dataset.id;
-        const name = row.querySelector(".category-name-en").value.trim();
-        const nameAr = row.querySelector(".category-name-ar").value.trim();
+    container.querySelector("#save-categories")?.addEventListener("click", async () => {
+      const saveBtn = container.querySelector("#save-categories");
+      const statusBox = container.querySelector("#categories-status");
+      const rows = [...container.querySelectorAll(".category-translate-row")].map((row) => ({
+        id: row.dataset.id,
+        name: row.querySelector(".category-name-en").value.trim(),
+        nameAr: row.querySelector(".category-name-ar").value.trim(),
+      }));
 
-        if (!name || !nameAr) {
-          showToast("Both the English and Arabic name are required.", { type: "error" });
-          return;
-        }
+      const invalidRow = rows.find((r) => !r.name || !r.nameAr);
+      if (invalidRow) {
+        statusBox.hidden = false;
+        statusBox.className = "settings-status settings-status-error";
+        statusBox.textContent = "Every category needs both an English and Arabic name.";
+        return;
+      }
 
-        btn.disabled = true;
-        const { error } = await supabase
-          .from("categories")
-          .update({ name, name_ar: nameAr })
-          .eq("id", id);
-        btn.disabled = false;
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving…";
 
-        if (error) {
-          showToast("Couldn't save that category. Try again.", { type: "error" });
-          return;
-        }
+      const results = await Promise.all(
+        rows.map((r) => supabase.from("categories").update({ name: r.name, name_ar: r.nameAr }).eq("id", r.id))
+      );
 
-        const category = categories.find((c) => c.id === id);
-        if (category) Object.assign(category, { name, name_ar: nameAr });
-        showToast("Category saved.", { type: "success" });
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Categories";
+
+      const failed = results.some((r) => r.error);
+      statusBox.hidden = false;
+      if (failed) {
+        statusBox.className = "settings-status settings-status-error";
+        statusBox.textContent = "Couldn't save one or more categories. Try again.";
+        return;
+      }
+
+      rows.forEach((r) => {
+        const category = categories.find((c) => c.id === r.id);
+        if (category) Object.assign(category, { name: r.name, name_ar: r.nameAr });
       });
+      statusBox.className = "settings-status settings-status-success";
+      statusBox.textContent = "Categories saved.";
     });
 
     container.querySelector("#add-category").addEventListener("click", async () => {
@@ -243,6 +347,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     });
 
     container.querySelector("#save-settings").addEventListener("click", () => save(restaurant));
+    container.querySelector("#save-theme").addEventListener("click", () => saveTheme(restaurant));
   }
 
   function renderLogoField() {
@@ -289,10 +394,37 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     }
   }
 
+  function renderQrCode(restaurant) {
+    if (!restaurant.site_url) return;
+    const canvas = container.querySelector("#qr-canvas");
+    QRCode.toCanvas(canvas, restaurant.site_url, { width: 220, margin: 2 }, (err) => {
+      if (err) console.error("Failed to render QR code:", err);
+    });
+
+    container.querySelector("#print-qr").addEventListener("click", () => {
+      const dataUrl = canvas.toDataURL("image/png");
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(`
+        <html>
+          <head><title>${restaurant.name} — QR Code</title></head>
+          <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;">
+            <img src="${dataUrl}" alt="QR code" style="width:320px;height:320px;" />
+            <p style="margin-top:16px;font-size:18px;">${restaurant.name}</p>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    });
+  }
+
   async function save(restaurant) {
     const saveBtn = container.querySelector("#save-settings");
     const statusBox = container.querySelector("#settings-status");
     const name = container.querySelector("#restaurant-name").value.trim();
+    const siteUrl = container.querySelector("#site-url").value.trim();
+    const featuredItemId = container.querySelector("#featured-item").value || null;
     const deployWebhookUrl = container.querySelector("#deploy-webhook").value.trim();
 
     if (!name) {
@@ -327,14 +459,15 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       logoUrl = null;
     }
 
-    const { error } = await supabase
-      .from("restaurants")
-      .update({
-        name,
-        logo_url: logoUrl,
-        deploy_webhook_url: deployWebhookUrl || null,
-      })
-      .eq("id", restaurant.id);
+    const updates = {
+      name,
+      logo_url: logoUrl,
+      site_url: siteUrl || null,
+      featured_item_id: featuredItemId,
+      deploy_webhook_url: deployWebhookUrl || null,
+    };
+
+    const { error } = await supabase.from("restaurants").update(updates).eq("id", restaurant.id);
 
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Settings";
@@ -346,11 +479,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       return;
     }
 
-    Object.assign(restaurant, {
-      name,
-      logo_url: logoUrl,
-      deploy_webhook_url: deployWebhookUrl || null,
-    });
+    Object.assign(restaurant, updates);
 
     // Re-render so the sidebar logo, restaurant-switcher label, and every
     // other field reflect what was just saved, then show the success
@@ -360,6 +489,34 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     freshStatusBox.hidden = false;
     freshStatusBox.className = "settings-status settings-status-success";
     freshStatusBox.textContent = "Settings saved.";
+  }
+
+  async function saveTheme(restaurant) {
+    const saveBtn = container.querySelector("#save-theme");
+    const statusBox = container.querySelector("#theme-status");
+
+    const theme = Object.fromEntries(
+      THEME_FIELDS.map((field) => [field.key, container.querySelector(`#theme-${field.key}`).value])
+    );
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+
+    const { error } = await supabase.from("restaurants").update({ theme }).eq("id", restaurant.id);
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Theme";
+
+    statusBox.hidden = false;
+    if (error) {
+      statusBox.className = "settings-status settings-status-error";
+      statusBox.textContent = "Couldn't save theme. Try again.";
+      return;
+    }
+
+    restaurant.theme = theme;
+    statusBox.className = "settings-status settings-status-success";
+    statusBox.textContent = "Theme saved. Publish Changes to make it live.";
   }
 
   load();

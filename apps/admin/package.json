@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@scanmenu/shared": "*",
-    "cropperjs": "^1.6.3"
+    "cropperjs": "^1.6.3",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "vite": "^5.4.0"
