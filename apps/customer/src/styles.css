@@ -292,12 +292,11 @@ button {
 }
 
 .featured-card-eyebrow {
-  font-size: 11px;
+  font-family: var(--font-display);
+  font-size: 20px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #000;
-  margin: 0 0 10px;
+  color: #fff;
+  margin: 0 0 12px;
 }
 
 .featured-card-body {
@@ -324,7 +323,7 @@ button {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 16px;
-  color: var(--c-name);
+  color: #000;
   margin: 0 0 8px;
 }
 
