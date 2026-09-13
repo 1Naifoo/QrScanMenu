@@ -998,6 +998,25 @@ body {
   flex-shrink: 0;
 }
 
+.featured-item-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.featured-item-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--ink);
+}
+
 .qr-code-panel {
   display: flex;
   flex-direction: column;

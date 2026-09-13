@@ -30,7 +30,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
   const { data: memberships, error: membershipError } = await supabase
     .from("restaurant_admins")
     .select(
-      "restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url, site_url, theme, featured_item_id)"
+      "restaurant_id, role, restaurants(id, name, slug, logo_url, deploy_webhook_url, site_url, theme, featured_item_ids)"
     )
     .eq("user_id", session.user.id);
 
@@ -159,17 +159,26 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
             </div>
 
             <div class="field">
-              <label for="featured-item">Featured item</label>
-              <select id="featured-item">
-                <option value="">None (auto-pick)</option>
-                ${items
-                  .map(
-                    (i) =>
-                      `<option value="${i.id}" ${i.id === restaurant.featured_item_id ? "selected" : ""}>${i.name}</option>`
-                  )
-                  .join("")}
-              </select>
-              <p class="field-hint">Shown in the "See what's inside" card on your customer site's home screen.</p>
+              <label>Featured items</label>
+              <div class="featured-item-checklist">
+                ${
+                  items.length === 0
+                    ? `<p class="field-hint">Add a menu item first, then feature it here.</p>`
+                    : items
+                        .map(
+                          (i) => `
+                    <label class="featured-item-option">
+                      <input type="checkbox" class="featured-item-checkbox" value="${i.id}" ${
+                            (restaurant.featured_item_ids || []).includes(i.id) ? "checked" : ""
+                          } />
+                      ${i.name}
+                    </label>
+                  `
+                        )
+                        .join("")
+                }
+              </div>
+              <p class="field-hint">Shown in the "See what's inside" section on your customer site's home screen. Leave all unchecked to auto-pick one.</p>
             </div>
 
             <div class="field">
@@ -197,7 +206,12 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 (field) => `
                 <div class="theme-field">
                   <label for="theme-${field.key}">${field.label}</label>
-                  <input type="color" id="theme-${field.key}" value="${restaurant.theme?.[field.key] || THEME_FALLBACK}" />
+                  <input
+                    type="color"
+                    id="theme-${field.key}"
+                    value="${restaurant.theme?.[field.key] || THEME_FALLBACK}"
+                    data-touched="${restaurant.theme?.[field.key] ? "true" : "false"}"
+                  />
                 </div>
               `
               ).join("")}
@@ -252,6 +266,16 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
     renderLogoField();
     renderQrCode(restaurant);
+
+    // A color input always has a value — it can't represent "not set" — so
+    // track which swatches the admin actually touched. saveTheme() below
+    // only writes touched fields, leaving the rest as whatever they already
+    // were (unset = template default), matching the hint text above.
+    THEME_FIELDS.forEach((field) => {
+      container.querySelector(`#theme-${field.key}`).addEventListener("input", (e) => {
+        e.target.dataset.touched = "true";
+      });
+    });
 
     container.querySelector("#restaurant-select").addEventListener("change", (e) => {
       state.restaurantId = e.target.value;
@@ -424,7 +448,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     const statusBox = container.querySelector("#settings-status");
     const name = container.querySelector("#restaurant-name").value.trim();
     const siteUrl = container.querySelector("#site-url").value.trim();
-    const featuredItemId = container.querySelector("#featured-item").value || null;
+    const featuredItemIds = [...container.querySelectorAll(".featured-item-checkbox:checked")].map((el) => el.value);
     const deployWebhookUrl = container.querySelector("#deploy-webhook").value.trim();
 
     if (!name) {
@@ -463,7 +487,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       name,
       logo_url: logoUrl,
       site_url: siteUrl || null,
-      featured_item_id: featuredItemId,
+      featured_item_ids: featuredItemIds,
       deploy_webhook_url: deployWebhookUrl || null,
     };
 
@@ -495,9 +519,11 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     const saveBtn = container.querySelector("#save-theme");
     const statusBox = container.querySelector("#theme-status");
 
-    const theme = Object.fromEntries(
-      THEME_FIELDS.map((field) => [field.key, container.querySelector(`#theme-${field.key}`).value])
-    );
+    const theme = { ...(restaurant.theme || {}) };
+    THEME_FIELDS.forEach((field) => {
+      const input = container.querySelector(`#theme-${field.key}`);
+      if (input.dataset.touched === "true") theme[field.key] = input.value;
+    });
 
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving…";

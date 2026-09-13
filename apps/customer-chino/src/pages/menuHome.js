@@ -9,13 +9,17 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
     categories.map((c) => [c.id, items.filter((i) => i.category_id === c.id)])
   );
 
-  // Highlight one dish's ingredients on the home screen as a teaser —
-  // whichever item the admin explicitly chose (Settings), or if none is
-  // set yet, fall back to the first available item with a photo and an
-  // ingredients list so the card isn't just empty by default.
-  const featuredItem =
-    items.find((i) => i.id === restaurant.featuredItemId && i.is_available) ??
-    items.find((i) => i.is_available && i.photo_url && i.ingredients?.length > 0);
+  // Highlight one or more dishes' ingredients on the home screen as a
+  // teaser — whichever items the admin explicitly chose (Settings), or if
+  // none are set yet, fall back to the first available item with a photo
+  // and an ingredients list so the card isn't just empty by default.
+  const chosenFeatured = (restaurant.featuredItemIds || [])
+    .map((id) => items.find((i) => i.id === id && i.is_available))
+    .filter(Boolean);
+  const featuredItems =
+    chosenFeatured.length > 0
+      ? chosenFeatured
+      : [items.find((i) => i.is_available && i.photo_url && i.ingredients?.length > 0)].filter(Boolean);
 
   let observer = null;
 
@@ -44,9 +48,9 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
       </nav>
 
       <main class="menu-body">
-        ${
-          featuredItem
-            ? `
+        ${featuredItems
+          .map(
+            (featuredItem) => `
           <section class="featured-card">
             <p class="featured-card-eyebrow">${t("menu.featuredEyebrow")}</p>
             <div class="featured-card-body">
@@ -60,8 +64,8 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
             </div>
           </section>
         `
-            : ""
-        }
+          )
+          .join("")}
         ${categories
           .map((category) => {
             const categoryItems = (itemsByCategory[category.id] || []).filter((i) => i.is_available);

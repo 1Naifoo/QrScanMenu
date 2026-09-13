@@ -43,7 +43,7 @@ async function main() {
 
   const { data: restaurant, error: restaurantError } = await supabase
     .from("restaurants")
-    .select("id, name, slug, logo_url, language_default, theme, featured_item_id")
+    .select("id, name, slug, logo_url, language_default, theme, featured_item_ids")
     .eq("slug", slug)
     .single();
 
@@ -77,7 +77,7 @@ async function main() {
       slug: restaurant.slug,
       logoUrl: restaurant.logo_url,
       languageDefault: restaurant.language_default,
-      featuredItemId: restaurant.featured_item_id,
+      featuredItemIds: restaurant.featured_item_ids || [],
     },
     categories: categories || [],
     items: items || [],
