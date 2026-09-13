@@ -441,7 +441,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       // Logos are rendered at a fixed height with natural width (see
       // apps/customer/src/styles.css .menu-logo) — no fixed aspect ratio
       // to lock to, so this crop step is a free-form frame/trim only.
-      const cropped = await cropImage(file, { aspectRatio: NaN });
+      const cropped = await cropImage(file, { aspectRatio: NaN, format: "image/png" });
       if (!cropped) return;
       logoFile = cropped;
       logoRemoved = false;

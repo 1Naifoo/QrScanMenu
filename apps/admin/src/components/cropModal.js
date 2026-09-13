@@ -6,7 +6,7 @@
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 
-export function cropImage(file, { aspectRatio = 4 / 3 } = {}) {
+export function cropImage(file, { aspectRatio = 4 / 3, format = "image/jpeg" } = {}) {
   return new Promise((resolve) => {
     const objectUrl = URL.createObjectURL(file);
 
@@ -44,11 +44,15 @@ export function cropImage(file, { aspectRatio = 4 / 3 } = {}) {
 
     overlay.querySelector("#crop-modal-cancel").addEventListener("click", () => close(null));
     overlay.querySelector("#crop-modal-confirm").addEventListener("click", () => {
+      // JPEG has no alpha channel — cropping a transparent PNG through it
+      // flattens the transparent areas to solid black. PNG output (used for
+      // the logo) keeps transparency; dish photos stay JPEG for file size.
       const canvas = cropper.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
+      const extension = format === "image/png" ? "png" : "jpg";
       canvas.toBlob(
-        (blob) => close(blob ? new File([blob], file.name, { type: "image/jpeg" }) : null),
-        "image/jpeg",
-        0.9
+        (blob) => close(blob ? new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.${extension}`, { type: format }) : null),
+        format,
+        format === "image/png" ? undefined : 0.9
       );
     });
   });
