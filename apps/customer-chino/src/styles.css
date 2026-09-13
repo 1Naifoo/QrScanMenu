@@ -350,6 +350,8 @@ button {
 }
 
 .item-card {
+  width: 100%;
+  min-width: 0;
   background: var(--c-surface-card);
   border: none;
   border-radius: 14px;
@@ -363,6 +365,7 @@ button {
 }
 
 .item-card-photo {
+  width: 100%;
   aspect-ratio: 4 / 3;
   background: rgba(0, 0, 0, 0.06);
   border-radius: 6px;
