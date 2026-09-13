@@ -462,7 +462,7 @@ button {
 
 .dish-name {
   font-family: var(--font-display);
-  color: var(--c-name);
+  color: #fff;
   font-size: 22px;
   margin: 0;
 }
