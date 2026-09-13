@@ -10,17 +10,17 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
     categories.map((c) => [c.id, items.filter((i) => i.category_id === c.id)])
   );
 
-  // Highlight one or more dishes' ingredients on the home screen as a
-  // teaser — whichever items the admin explicitly chose (Settings), or if
-  // none are set yet, fall back to the first available item with a photo
-  // and an ingredients list so the card isn't just empty by default.
+  // Highlight one or more dishes on the home screen as a teaser —
+  // whichever items the admin explicitly chose (Settings), or if none are
+  // set yet, fall back to the first available item with a photo and a
+  // featured caption written by the admin.
   const chosenFeatured = (restaurant.featuredItemIds || [])
     .map((id) => items.find((i) => i.id === id && i.is_available))
     .filter(Boolean);
   const featuredItems =
     chosenFeatured.length > 0
       ? chosenFeatured
-      : [items.find((i) => i.is_available && i.photo_url && i.ingredients?.length > 0)].filter(Boolean);
+      : [items.find((i) => i.is_available && i.photo_url && i.featured_caption)].filter(Boolean);
 
   let observer = null;
 
@@ -50,22 +50,21 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
 
       <main class="menu-body">
         ${featuredItems
-          .map(
-            (featuredItem) => `
+          .map((featuredItem) => {
+            const caption = localize(featuredItem.featured_caption, featuredItem.featured_caption_ar);
+            return `
           <section class="featured-card">
             <p class="featured-card-eyebrow">${t("menu.featuredEyebrow")}</p>
             <div class="featured-card-body">
               <div class="featured-card-photo"><img src="${featuredItem.photo_url}" alt="" /></div>
               <div>
                 <h3 class="featured-card-name">${localize(featuredItem.name, featuredItem.name_ar)}</h3>
-                <ul class="featured-card-ingredients">
-                  ${featuredItem.ingredients.map((ing) => `<li>${ing}</li>`).join("")}
-                </ul>
+                ${caption ? `<p class="featured-card-caption">${caption}</p>` : ""}
               </div>
             </div>
           </section>
-        `
-          )
+        `;
+          })
           .join("")}
         ${categories
           .map((category) => {

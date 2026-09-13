@@ -303,31 +303,12 @@ button {
   margin: 0 0 8px;
 }
 
-.featured-card-ingredients {
-  list-style: none;
+.featured-card-caption {
   margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 12px;
-}
-
-.featured-card-ingredients li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--c-text-on-dark);
   opacity: 0.85;
-}
-
-.featured-card-ingredients li::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--c-accent);
-  flex-shrink: 0;
 }
 
 .category-title {

@@ -72,7 +72,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
         .order("sort_order"),
       supabase
         .from("items")
-        .select("id, name, name_ar, category_id, price, is_spicy, is_available, photo_url, description, description_ar, ingredients, options, sort_order")
+        .select("id, name, name_ar, category_id, price, is_spicy, is_available, photo_url, description, description_ar, ingredients, options, sort_order, featured_caption, featured_caption_ar")
         .eq("restaurant_id", state.restaurantId)
         .order("sort_order"),
     ]);

@@ -62,6 +62,17 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
         </div>
 
         <div class="field">
+          <label for="item-featured-caption">Featured card text (English)</label>
+          <textarea id="item-featured-caption" rows="2">${item?.featured_caption ?? ""}</textarea>
+          <p class="field-hint">Shown on the customer site's home screen if this item is chosen as Featured in Settings. Leave blank to skip that card.</p>
+        </div>
+
+        <div class="field">
+          <label for="item-featured-caption-ar">Featured card text (Arabic)</label>
+          <textarea id="item-featured-caption-ar" dir="rtl" rows="2">${item?.featured_caption_ar ?? ""}</textarea>
+        </div>
+
+        <div class="field">
           <label>Options</label>
           <p class="field-hint">
             A group (e.g. "Milk Type") shows as a row of buttons the customer picks
@@ -294,6 +305,8 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
       .value.split("\n")
       .map((line) => line.trim())
       .filter(Boolean);
+    const featuredCaption = overlay.querySelector("#item-featured-caption").value.trim();
+    const featuredCaptionAr = overlay.querySelector("#item-featured-caption-ar").value.trim();
     const options = optionGroups.filter((g) => g.choices.length > 0);
     const price = parseFloat(overlay.querySelector("#item-price").value);
     const isSpicy = overlay.querySelector("#item-spicy").checked;
@@ -306,6 +319,11 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
 
     if (!description || !descriptionAr) {
       showError("Enter both an English and Arabic description before saving.");
+      return;
+    }
+
+    if (Boolean(featuredCaption) !== Boolean(featuredCaptionAr)) {
+      showError("Enter the featured card text in both languages, or leave both blank.");
       return;
     }
 
@@ -341,6 +359,8 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
       description,
       description_ar: descriptionAr,
       ingredients,
+      featured_caption: featuredCaption || null,
+      featured_caption_ar: featuredCaptionAr || null,
       options,
       price,
       is_spicy: isSpicy,
