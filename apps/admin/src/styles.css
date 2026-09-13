@@ -1012,9 +1012,25 @@ body {
   padding: 8px 12px;
   background: var(--paper);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 14px;
+  font-weight: 600;
   color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.featured-item-option:has(.featured-item-checkbox:checked) {
+  background: rgba(232, 146, 63, 0.1);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.featured-item-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .qr-code-panel {
