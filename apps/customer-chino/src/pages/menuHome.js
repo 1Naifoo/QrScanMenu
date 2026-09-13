@@ -3,7 +3,8 @@ import { RIYAL_ICON_SVG } from "../riyalIcon.js";
 import { t, getLanguage, setLanguage, localize } from "../i18n/index.js";
 
 export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
-  const { restaurant, categories, items } = menu;
+  const { restaurant, items } = menu;
+  const categories = menu.categories.filter((c) => c.is_available !== false);
 
   const itemsByCategory = Object.fromEntries(
     categories.map((c) => [c.id, items.filter((i) => i.category_id === c.id)])

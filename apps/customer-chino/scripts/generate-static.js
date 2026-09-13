@@ -56,7 +56,7 @@ async function main() {
     await Promise.all([
       supabase
         .from("categories")
-        .select("id, name, name_ar, sort_order")
+        .select("id, name, name_ar, sort_order, is_available")
         .eq("restaurant_id", restaurant.id)
         .order("sort_order"),
       supabase

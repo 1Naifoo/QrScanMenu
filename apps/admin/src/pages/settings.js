@@ -85,7 +85,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     ] = await Promise.all([
       supabase
         .from("categories")
-        .select("id, name, name_ar, sort_order")
+        .select("id, name, name_ar, sort_order, is_available")
         .eq("restaurant_id", state.restaurantId)
         .order("sort_order"),
       supabase
@@ -262,6 +262,10 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 <div class="category-translate-row" data-id="${c.id}">
                   <input type="text" class="category-name-en" value="${c.name}" placeholder="${t("settings.categoryNameEn")}" />
                   <input type="text" class="category-name-ar" dir="rtl" value="${c.name_ar ?? ""}" placeholder="${t("settings.categoryNameAr")}" />
+                  <label class="toggle-switch category-available-toggle" title="Shown on customer site">
+                    <input type="checkbox" class="category-available" ${c.is_available !== false ? "checked" : ""} />
+                    <span class="toggle-track"></span>
+                  </label>
                 </div>
               `
                 )
@@ -319,6 +323,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
         id: row.dataset.id,
         name: row.querySelector(".category-name-en").value.trim(),
         nameAr: row.querySelector(".category-name-ar").value.trim(),
+        isAvailable: row.querySelector(".category-available").checked,
       }));
 
       const invalidRow = rows.find((r) => !r.name || !r.nameAr);
@@ -333,7 +338,12 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       saveBtn.textContent = "Saving…";
 
       const results = await Promise.all(
-        rows.map((r) => supabase.from("categories").update({ name: r.name, name_ar: r.nameAr }).eq("id", r.id))
+        rows.map((r) =>
+          supabase
+            .from("categories")
+            .update({ name: r.name, name_ar: r.nameAr, is_available: r.isAvailable })
+            .eq("id", r.id)
+        )
       );
 
       saveBtn.disabled = false;
@@ -349,7 +359,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
       rows.forEach((r) => {
         const category = categories.find((c) => c.id === r.id);
-        if (category) Object.assign(category, { name: r.name, name_ar: r.nameAr });
+        if (category) Object.assign(category, { name: r.name, name_ar: r.nameAr, is_available: r.isAvailable });
       });
       statusBox.className = "settings-status settings-status-success";
       statusBox.textContent = "Categories saved.";
