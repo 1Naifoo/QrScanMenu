@@ -13,6 +13,7 @@ export async function applyTheme() {
   root.setProperty("--c-surface-card", theme.surfaceCard);
   root.setProperty("--c-text-on-dark", theme.textOnDark);
   root.setProperty("--c-name", theme.nameColor);
+  root.setProperty("--c-section-header", theme.sectionHeader);
   root.setProperty("--c-price", theme.priceColor);
   root.setProperty("--c-accent", theme.accent);
   root.setProperty("--c-danger", theme.danger);

@@ -18,6 +18,7 @@ const THEME_FIELDS = [
   { key: "surfaceCard", label: "Card surface (item cards, My List)" },
   { key: "textOnDark", label: "Text on dark" },
   { key: "nameColor", label: "Dish name" },
+  { key: "sectionHeader", label: "Section headers (category titles)" },
   { key: "priceColor", label: "Price" },
   { key: "accent", label: "Accent (buttons, active states)" },
   { key: "danger", label: "Danger (spicy, delete)" },
@@ -210,7 +211,12 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
             <div class="settings-status" id="settings-status" hidden></div>
 
-            <button class="primary-button" id="save-settings">${t("settings.save")}</button>
+            <div class="settings-panel-actions">
+              <button class="primary-button" id="save-settings">${t("settings.save")}</button>
+              <button class="publish-button" id="publish">${t("menuItems.publish")}</button>
+            </div>
+
+            <div class="publish-status" id="publish-status" hidden></div>
           </div>
 
           <div class="settings-panel">
@@ -405,6 +411,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
     container.querySelector("#save-settings").addEventListener("click", () => save(restaurant));
     container.querySelector("#save-theme").addEventListener("click", () => saveTheme(restaurant));
+    container.querySelector("#publish").addEventListener("click", () => publish(restaurant));
   }
 
   function renderLogoField() {
@@ -546,6 +553,26 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
     freshStatusBox.hidden = false;
     freshStatusBox.className = "settings-status settings-status-success";
     freshStatusBox.textContent = "Settings saved.";
+  }
+
+  async function publish(restaurant) {
+    const statusBox = container.querySelector("#publish-status");
+    if (!restaurant.deploy_webhook_url) {
+      statusBox.hidden = false;
+      statusBox.textContent =
+        "No deploy hook is set up for this restaurant yet — changes are saved, but the live site won't update until one is configured.";
+      return;
+    }
+
+    statusBox.hidden = false;
+    statusBox.textContent = "Publishing…";
+
+    try {
+      await fetch(restaurant.deploy_webhook_url, { method: "POST" });
+      statusBox.textContent = "Published. The live menu will update shortly.";
+    } catch {
+      statusBox.textContent = "Couldn't reach the deploy hook. Check the URL and try again.";
+    }
   }
 
   async function saveTheme(restaurant) {
