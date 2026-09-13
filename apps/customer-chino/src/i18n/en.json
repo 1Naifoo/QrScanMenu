@@ -3,6 +3,8 @@
   "menu.featuredEyebrow": "See what's inside",
   "itemCard.add": "Add",
   "dish.descriptionLabel": "Description",
+  "dish.caloriesLabel": "Calories",
+  "dish.allergiesLabel": "Allergies",
   "dish.spicy": "Spicy",
   "dish.optionRequired": "Please choose one.",
   "dish.optionRequiredToast": "Please choose an option for every group before adding.",

@@ -61,7 +61,7 @@ async function main() {
         .order("sort_order"),
       supabase
         .from("items")
-        .select("id, category_id, name, name_ar, description, description_ar, ingredients, options, price, is_spicy, is_available, photo_url, sort_order, featured_caption, featured_caption_ar")
+        .select("id, category_id, name, name_ar, description, description_ar, ingredients, options, price, is_spicy, is_available, photo_url, sort_order, featured_caption, featured_caption_ar, calories, allergies, allergies_ar")
         .eq("restaurant_id", restaurant.id)
         .order("sort_order"),
     ]);

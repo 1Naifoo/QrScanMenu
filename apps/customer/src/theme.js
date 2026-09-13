@@ -16,6 +16,7 @@ export async function applyTheme() {
   root.setProperty("--c-price", theme.priceColor);
   root.setProperty("--c-accent", theme.accent);
   root.setProperty("--c-danger", theme.danger);
+  root.setProperty("--c-featured-bg", theme.featuredBg);
   root.setProperty("--font-display", `"${theme.fontDisplay}", sans-serif`);
   root.setProperty("--font-body", `"${theme.fontBody}", sans-serif`);
 

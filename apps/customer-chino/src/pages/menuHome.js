@@ -2,6 +2,35 @@ import { getCount } from "../state/myList.js";
 import { RIYAL_ICON_SVG } from "../riyalIcon.js";
 import { t, getLanguage, setLanguage, localize } from "../i18n/index.js";
 
+// Mouse drag-to-scroll for the featured card row — touch devices already
+// scroll it natively via overflow-x, this is just for desktop/mouse users.
+function enableDragScroll(row) {
+  if (!row) return;
+  let isDown = false;
+  let startX = 0;
+  let startScroll = 0;
+
+  row.addEventListener("mousedown", (e) => {
+    isDown = true;
+    row.classList.add("dragging");
+    startX = e.pageX;
+    startScroll = row.scrollLeft;
+  });
+
+  ["mouseleave", "mouseup"].forEach((evt) =>
+    row.addEventListener(evt, () => {
+      isDown = false;
+      row.classList.remove("dragging");
+    })
+  );
+
+  row.addEventListener("mousemove", (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    row.scrollLeft = startScroll - (e.pageX - startX);
+  });
+}
+
 export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
   const { restaurant, items } = menu;
   const categories = menu.categories.filter((c) => c.is_available !== false);
@@ -49,23 +78,33 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
       </nav>
 
       <main class="menu-body">
-        ${featuredItems
-          .map((featuredItem) => {
-            const caption = localize(featuredItem.featured_caption, featuredItem.featured_caption_ar);
-            return `
-          <section class="featured-card">
+        ${
+          featuredItems.length > 0
+            ? `
+          <section class="featured-section">
             <p class="featured-card-eyebrow">${t("menu.featuredEyebrow")}</p>
-            <div class="featured-card-body">
-              <div class="featured-card-photo"><img src="${featuredItem.photo_url}" alt="" /></div>
-              <div>
-                <h3 class="featured-card-name">${localize(featuredItem.name, featuredItem.name_ar)}</h3>
-                ${caption ? `<p class="featured-card-caption">${caption}</p>` : ""}
-              </div>
+            <div class="featured-card-row" id="featured-card-row">
+              ${featuredItems
+                .map((featuredItem) => {
+                  const caption = localize(featuredItem.featured_caption, featuredItem.featured_caption_ar);
+                  return `
+                <div class="featured-card">
+                  <div class="featured-card-body">
+                    <div class="featured-card-photo"><img src="${featuredItem.photo_url}" alt="" /></div>
+                    <div>
+                      <h3 class="featured-card-name">${localize(featuredItem.name, featuredItem.name_ar)}</h3>
+                      ${caption ? `<p class="featured-card-caption">${caption}</p>` : ""}
+                    </div>
+                  </div>
+                </div>
+              `;
+                })
+                .join("")}
             </div>
           </section>
-        `;
-          })
-          .join("")}
+        `
+            : ""
+        }
         ${categories
           .map((category) => {
             const categoryItems = (itemsByCategory[category.id] || []).filter((i) => i.is_available);
@@ -97,6 +136,8 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
           .join("")}
       </main>
     `;
+
+    enableDragScroll(container.querySelector("#featured-card-row"));
 
     container.querySelectorAll(".lang-option").forEach((btn) => {
       btn.addEventListener("click", () => {

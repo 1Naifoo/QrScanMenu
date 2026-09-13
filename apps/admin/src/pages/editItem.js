@@ -62,6 +62,21 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
         </div>
 
         <div class="field">
+          <label for="item-calories">Calories</label>
+          <input type="number" id="item-calories" min="0" step="1" value="${item?.calories ?? ""}" />
+        </div>
+
+        <div class="field">
+          <label for="item-allergies">Allergies (English)</label>
+          <input type="text" id="item-allergies" placeholder="Contains nuts, dairy" value="${item?.allergies ?? ""}" />
+        </div>
+
+        <div class="field">
+          <label for="item-allergies-ar">Allergies (Arabic)</label>
+          <input type="text" id="item-allergies-ar" dir="rtl" value="${item?.allergies_ar ?? ""}" />
+        </div>
+
+        <div class="field">
           <label for="item-featured-caption">Featured card text (English)</label>
           <textarea id="item-featured-caption" rows="2">${item?.featured_caption ?? ""}</textarea>
           <p class="field-hint">Shown on the customer site's home screen if this item is chosen as Featured in Settings. Leave blank to skip that card.</p>
@@ -307,6 +322,10 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
       .filter(Boolean);
     const featuredCaption = overlay.querySelector("#item-featured-caption").value.trim();
     const featuredCaptionAr = overlay.querySelector("#item-featured-caption-ar").value.trim();
+    const caloriesRaw = overlay.querySelector("#item-calories").value.trim();
+    const calories = caloriesRaw ? parseInt(caloriesRaw, 10) : null;
+    const allergies = overlay.querySelector("#item-allergies").value.trim();
+    const allergiesAr = overlay.querySelector("#item-allergies-ar").value.trim();
     const options = optionGroups.filter((g) => g.choices.length > 0);
     const price = parseFloat(overlay.querySelector("#item-price").value);
     const isSpicy = overlay.querySelector("#item-spicy").checked;
@@ -324,6 +343,16 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
 
     if (Boolean(featuredCaption) !== Boolean(featuredCaptionAr)) {
       showError("Enter the featured card text in both languages, or leave both blank.");
+      return;
+    }
+
+    if (caloriesRaw && (Number.isNaN(calories) || calories < 0)) {
+      showError("Calories must be a positive number.");
+      return;
+    }
+
+    if (Boolean(allergies) !== Boolean(allergiesAr)) {
+      showError("Enter allergies in both languages, or leave both blank.");
       return;
     }
 
@@ -361,6 +390,9 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
       ingredients,
       featured_caption: featuredCaption || null,
       featured_caption_ar: featuredCaptionAr || null,
+      calories,
+      allergies: allergies || null,
+      allergies_ar: allergiesAr || null,
       options,
       price,
       is_spicy: isSpicy,

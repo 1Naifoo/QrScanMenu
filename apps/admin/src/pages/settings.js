@@ -21,6 +21,7 @@ const THEME_FIELDS = [
   { key: "priceColor", label: "Price" },
   { key: "accent", label: "Accent (buttons, active states)" },
   { key: "danger", label: "Danger (spicy, delete)" },
+  { key: "featuredBg", label: "Featured card background" },
 ];
 const THEME_FALLBACK = "#808080";
 

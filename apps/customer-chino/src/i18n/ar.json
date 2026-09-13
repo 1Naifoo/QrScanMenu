@@ -1,8 +1,10 @@
 {
   "menu.myListButton": "قائمتي",
-  "menu.featuredEyebrow": "تعرف على المكونات",
+  "menu.featuredEyebrow": "تعرف على ما بالداخل",
   "itemCard.add": "إضافة",
   "dish.descriptionLabel": "الوصف",
+  "dish.caloriesLabel": "السعرات الحرارية",
+  "dish.allergiesLabel": "مسببات الحساسية",
   "dish.spicy": "حار",
   "dish.optionRequired": "يرجى اختيار واحد.",
   "dish.optionRequiredToast": "يرجى اختيار خيار من كل مجموعة قبل الإضافة.",

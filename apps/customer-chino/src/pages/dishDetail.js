@@ -62,6 +62,13 @@ export function renderDishDetail(
             : ""
         }
 
+        ${item.calories ? `<p class="dish-meta"><strong>${t("dish.caloriesLabel")}:</strong> ${item.calories}</p>` : ""}
+        ${
+          localize(item.allergies, item.allergies_ar)
+            ? `<p class="dish-meta"><strong>${t("dish.allergiesLabel")}:</strong> ${localize(item.allergies, item.allergies_ar)}</p>`
+            : ""
+        }
+
         ${optionGroups
           .map(
             (group) => `
