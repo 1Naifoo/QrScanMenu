@@ -8,7 +8,7 @@
 import { promptModal } from "../components/promptModal.js";
 import { confirmModal } from "../components/confirmModal.js";
 import { showToast } from "../components/toast.js";
-import { RIYAL_ICON_SVG } from "@scanmenu/shared";
+import { RIYAL_ICON_SVG, escapeHtml, safeUrl } from "@scanmenu/shared";
 import { t, getLanguage, setLanguage } from "../i18n/index.js";
 
 export async function renderMenuItems(container, { supabase, session, onEditItem, onSignOut, onNavSettings }) {
@@ -102,15 +102,15 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
             <span class="login-logo-mark" aria-hidden="true"></span>
             <span>ScanMenu <strong>Admin</strong></span>
           </div>
-          ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${restaurant.logo_url}" alt="${restaurant.name}" /></div>` : ""}
-          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${restaurant.site_url}" target="_blank" rel="noopener">↗ View site</a>` : ""}
+          ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${escapeHtml(restaurant.logo_url)}" alt="${escapeHtml(restaurant.name)}" /></div>` : ""}
+          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${escapeHtml(safeUrl(restaurant.site_url))}" target="_blank" rel="noopener">↗ View site</a>` : ""}
           <div class="restaurant-switcher">
             <label for="restaurant-select">${t("sidebar.restaurant")}</label>
             <select id="restaurant-select">
               ${restaurants
                 .map(
                   (r) =>
-                    `<option value="${r.id}" ${r.id === state.restaurantId ? "selected" : ""}>${r.name}</option>`
+                    `<option value="${r.id}" ${r.id === state.restaurantId ? "selected" : ""}>${escapeHtml(r.name)}</option>`
                 )
                 .join("")}
             </select>
@@ -124,8 +124,8 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
             <button class="lang-option ${getLanguage() === "ar" ? "active" : ""}" data-lang="ar">العربية</button>
           </div>
           <div class="admin-account">
-            <span class="account-avatar">${session.user.email.charAt(0).toUpperCase()}</span>
-            <span class="account-email">${session.user.email}</span>
+            <span class="account-avatar">${escapeHtml(session.user.email.charAt(0).toUpperCase())}</span>
+            <span class="account-email">${escapeHtml(session.user.email)}</span>
             <button id="sign-out" class="link-button">${t("sidebar.signOut")}</button>
           </div>
         </aside>
@@ -135,7 +135,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
             <input type="search" id="search-input" placeholder="${t("menuItems.searchPlaceholder")}" value="${state.search}" />
             <details class="category-dropdown" id="category-dropdown">
               <summary class="category-dropdown-toggle">
-                <span>${state.categoryFilter === "all" ? t("menuItems.allCategories") : categoryById[state.categoryFilter] || t("menuItems.allCategories")}</span>
+                <span>${escapeHtml(state.categoryFilter === "all" ? t("menuItems.allCategories") : categoryById[state.categoryFilter] || t("menuItems.allCategories"))}</span>
                 <span class="dropdown-chevron">⌄</span>
               </summary>
               <div class="category-dropdown-menu">
@@ -143,7 +143,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
                 ${categories
                   .map(
                     (c) =>
-                      `<button type="button" class="category-dropdown-option ${c.id === state.categoryFilter ? "selected" : ""}" data-category="${c.id}">${c.name}</button>`
+                      `<button type="button" class="category-dropdown-option ${c.id === state.categoryFilter ? "selected" : ""}" data-category="${c.id}">${escapeHtml(c.name)}</button>`
                   )
                   .join("")}
               </div>
@@ -158,7 +158,7 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
             ${categories
               .map(
                 (c) =>
-                  `<button class="category-pill ${c.id === state.categoryFilter ? "active" : ""}" data-category="${c.id}">${c.name}</button>`
+                  `<button class="category-pill ${c.id === state.categoryFilter ? "active" : ""}" data-category="${c.id}">${escapeHtml(c.name)}</button>`
               )
               .join("")}
           </div>
@@ -182,10 +182,10 @@ export async function renderMenuItems(container, { supabase, session, onEditItem
                   (item) => `
                 <tr data-item-id="${item.id}">
                   <td class="item-thumb">
-                    ${item.photo_url ? `<img src="${item.photo_url}" alt="" />` : `<div class="thumb-placeholder"></div>`}
+                    ${item.photo_url ? `<img src="${escapeHtml(item.photo_url)}" alt="" />` : `<div class="thumb-placeholder"></div>`}
                   </td>
-                  <td>${item.name}${item.is_available ? "" : ` <span class="badge-unavailable">${t("menuItems.unavailable")}</span>`}</td>
-                  <td>${categoryById[item.category_id] || "—"}</td>
+                  <td>${escapeHtml(item.name)}${item.is_available ? "" : ` <span class="badge-unavailable">${t("menuItems.unavailable")}</span>`}</td>
+                  <td>${escapeHtml(categoryById[item.category_id]) || "—"}</td>
                   <td class="price-cell">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</td>
                   <td>${item.is_spicy ? "🌶️" : ""}</td>
                   <td class="item-row-actions">

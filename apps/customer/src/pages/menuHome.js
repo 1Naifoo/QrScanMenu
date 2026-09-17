@@ -1,6 +1,7 @@
 import { getCount } from "../state/myList.js";
 import { RIYAL_ICON_SVG } from "../riyalIcon.js";
 import { t, getLanguage, setLanguage, localize } from "../i18n/index.js";
+import { escapeHtml } from "../escapeHtml.js";
 
 // Mouse drag-to-scroll for the featured card row — touch devices already
 // scroll it natively via overflow-x, this is just for desktop/mouse users.
@@ -60,7 +61,7 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
           <button class="lang-option ${getLanguage() === "en" ? "active" : ""}" data-lang="en">English</button>
           <button class="lang-option ${getLanguage() === "ar" ? "active" : ""}" data-lang="ar">العربية</button>
         </div>
-        ${restaurant.logoUrl ? `<img class="menu-logo" src="${restaurant.logoUrl}" alt="${restaurant.name}" />` : `<span class="menu-logo-text">${restaurant.name}</span>`}
+        ${restaurant.logoUrl ? `<img class="menu-logo" src="${escapeHtml(restaurant.logoUrl)}" alt="${escapeHtml(restaurant.name)}" />` : `<span class="menu-logo-text">${escapeHtml(restaurant.name)}</span>`}
         <button class="my-list-shortcut" id="open-my-list">
           <svg class="my-list-icon" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>
           ${t("menu.myListButton")}
@@ -72,7 +73,7 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
         ${categories
           .map(
             (c, i) =>
-              `<button class="category-pill ${i === 0 ? "active" : ""}" data-target="category-${c.id}" data-category-id="${c.id}">${localize(c.name, c.name_ar)}</button>`
+              `<button class="category-pill ${i === 0 ? "active" : ""}" data-target="category-${c.id}" data-category-id="${c.id}">${escapeHtml(localize(c.name, c.name_ar))}</button>`
           )
           .join("")}
       </nav>
@@ -86,13 +87,13 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
             <div class="featured-card-row" id="featured-card-row">
               ${featuredItems
                 .map((featuredItem) => {
-                  const caption = localize(featuredItem.featured_caption, featuredItem.featured_caption_ar);
+                  const caption = escapeHtml(localize(featuredItem.featured_caption, featuredItem.featured_caption_ar));
                   return `
                 <div class="featured-card">
                   <div class="featured-card-body">
-                    <div class="featured-card-photo"><img src="${featuredItem.photo_url}" alt="" /></div>
+                    <div class="featured-card-photo"><img src="${escapeHtml(featuredItem.photo_url)}" alt="" /></div>
                     <div>
-                      <h3 class="featured-card-name">${localize(featuredItem.name, featuredItem.name_ar)}</h3>
+                      <h3 class="featured-card-name">${escapeHtml(localize(featuredItem.name, featuredItem.name_ar))}</h3>
                       ${caption ? `<p class="featured-card-caption">${caption}</p>` : ""}
                     </div>
                   </div>
@@ -111,16 +112,16 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
             if (categoryItems.length === 0) return "";
             return `
               <section class="category-section" id="category-${category.id}" data-category-id="${category.id}">
-                <h2 class="category-title">${localize(category.name, category.name_ar)}</h2>
+                <h2 class="category-title">${escapeHtml(localize(category.name, category.name_ar))}</h2>
                 <div class="item-grid">
                   ${categoryItems
                     .map(
                       (item) => `
                     <button class="item-card" data-item-id="${item.id}">
                       <div class="item-card-photo">
-                        ${item.photo_url ? `<img src="${item.photo_url}" alt="${item.name}" />` : ""}
+                        ${item.photo_url ? `<img src="${escapeHtml(item.photo_url)}" alt="${escapeHtml(item.name)}" />` : ""}
                       </div>
-                      <div class="item-card-name">${localize(item.name, item.name_ar)}</div>
+                      <div class="item-card-name">${escapeHtml(localize(item.name, item.name_ar))}</div>
                       <div class="item-card-footer">
                         <span class="item-card-price">${RIYAL_ICON_SVG} ${Number(item.price).toFixed(2)}</span>
                         <span class="item-card-add" data-add-id="${item.id}">${t("itemCard.add")}</span>

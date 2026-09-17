@@ -2,11 +2,12 @@ import { getList, updateQuantity, removeItem, clearAll, getTotal } from "../stat
 import { RIYAL_ICON_SVG } from "../riyalIcon.js";
 import { t, localize } from "../i18n/index.js";
 import { confirmModal } from "../components/confirmModal.js";
+import { escapeHtml } from "../escapeHtml.js";
 
 function describeOptions(selectedOptions) {
   const entries = Object.entries(selectedOptions || {});
   if (entries.length === 0) return "";
-  return entries.map(([group, choice]) => `${group}: ${choice}`).join(" · ");
+  return entries.map(([group, choice]) => `${escapeHtml(group)}: ${escapeHtml(choice)}`).join(" · ");
 }
 
 export function renderMyList(container, { onClose, onEditItem }) {
@@ -36,10 +37,10 @@ export function renderMyList(container, { onClose, onEditItem }) {
                 (row) => `
               <div class="my-list-row" data-line-id="${row.lineId}">
                 <div class="my-list-thumb">
-                  ${row.photoUrl ? `<img src="${row.photoUrl}" alt="" />` : ""}
+                  ${row.photoUrl ? `<img src="${escapeHtml(row.photoUrl)}" alt="" />` : ""}
                 </div>
                 <div class="my-list-info">
-                  <span class="my-list-name">${localize(row.name, row.nameAr)}</span>
+                  <span class="my-list-name">${escapeHtml(localize(row.name, row.nameAr))}</span>
                   ${describeOptions(row.selectedOptions) ? `<span class="my-list-options">${describeOptions(row.selectedOptions)}</span>` : ""}
                   <span class="my-list-price">${RIYAL_ICON_SVG} ${Number(row.price).toFixed(2)}</span>
                 </div>

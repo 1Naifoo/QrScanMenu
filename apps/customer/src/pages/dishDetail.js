@@ -2,6 +2,7 @@ import { addItem, removeItem } from "../state/myList.js";
 import { RIYAL_ICON_SVG } from "../riyalIcon.js";
 import { t, localize } from "../i18n/index.js";
 import { showToast } from "../components/toast.js";
+import { escapeHtml } from "../escapeHtml.js";
 
 function notifyAdded({ persisted }) {
   // Still added for this session (in-memory) even if persisted is false —
@@ -51,17 +52,17 @@ export function renderDishDetail(
       </div>
 
       <div class="dish-photo">
-        ${item.photo_url ? `<img src="${item.photo_url}" alt="${item.name}" />` : ""}
+        ${item.photo_url ? `<img src="${escapeHtml(item.photo_url)}" alt="${escapeHtml(item.name)}" />` : ""}
       </div>
 
       <div class="dish-body">
         <div class="dish-name-row">
-          <h1 class="dish-name">${localize(item.name, item.name_ar)}</h1>
+          <h1 class="dish-name">${escapeHtml(localize(item.name, item.name_ar))}</h1>
           ${item.calories ? `<span class="dish-calories">${item.calories} ${t("dish.caloriesUnit")}</span>` : ""}
         </div>
         ${
           item.description
-            ? `<p class="dish-section-label">${t("dish.descriptionLabel")}</p><p class="dish-description">${localize(item.description, item.description_ar)}</p>`
+            ? `<p class="dish-section-label">${t("dish.descriptionLabel")}</p><p class="dish-description">${escapeHtml(localize(item.description, item.description_ar))}</p>`
             : ""
         }
 
@@ -74,8 +75,8 @@ export function renderDishDetail(
         ${optionGroups
           .map(
             (group) => `
-          <div class="option-group" data-group="${group.name}">
-            <p class="dish-section-label">${group.name}</p>
+          <div class="option-group" data-group="${escapeHtml(group.name)}">
+            <p class="dish-section-label">${escapeHtml(group.name)}</p>
             <div class="option-choices">
               ${group.choices
                 .map(
@@ -83,8 +84,8 @@ export function renderDishDetail(
                 <button
                   type="button"
                   class="option-choice ${selectedOptions[group.name] === choice ? "active" : ""}"
-                  data-choice="${choice}"
-                >${choice}</button>
+                  data-choice="${escapeHtml(choice)}"
+                >${escapeHtml(choice)}</button>
               `
                 )
                 .join("")}
@@ -101,7 +102,7 @@ export function renderDishDetail(
           <div class="option-group">
             <p class="dish-section-label">${t("dish.allergiesLabel")}</p>
             <div class="option-choices">
-              ${allergiesList.map((a) => `<span class="option-choice option-choice-static">${a}</span>`).join("")}
+              ${allergiesList.map((a) => `<span class="option-choice option-choice-static">${escapeHtml(a)}</span>`).join("")}
             </div>
           </div>
         `

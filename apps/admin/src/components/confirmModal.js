@@ -1,16 +1,18 @@
 // A styled stand-in for window.confirm(). Resolves to true/false.
 
+import { escapeHtml } from "@scanmenu/shared";
+
 export function confirmModal({ title, message, confirmText = "Confirm", danger = false }) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "prompt-modal-overlay";
     overlay.innerHTML = `
       <div class="prompt-modal">
-        <h3>${title}</h3>
-        <p class="confirm-modal-message">${message}</p>
+        <h3>${escapeHtml(title)}</h3>
+        <p class="confirm-modal-message">${escapeHtml(message)}</p>
         <div class="prompt-modal-actions">
           <button type="button" class="secondary-button" id="confirm-modal-cancel">Cancel</button>
-          <button type="button" class="${danger ? "danger-button" : "primary-button"}" id="confirm-modal-confirm">${confirmText}</button>
+          <button type="button" class="${danger ? "danger-button" : "primary-button"}" id="confirm-modal-confirm">${escapeHtml(confirmText)}</button>
         </div>
       </div>
     `;

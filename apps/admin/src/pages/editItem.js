@@ -6,7 +6,7 @@
 import { promptModal } from "../components/promptModal.js";
 import { cropImage } from "../components/cropModal.js";
 import { showToast } from "../components/toast.js";
-import { RIYAL_ICON_SVG } from "@scanmenu/shared";
+import { RIYAL_ICON_SVG, escapeHtml } from "@scanmenu/shared";
 
 export function renderEditItem(container, { supabase, restaurant, categories, item, onDone, onClose }) {
   const isNew = !item;
@@ -30,35 +30,35 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
 
         <div class="field">
           <label for="item-name">Name (English)</label>
-          <input type="text" id="item-name" value="${item?.name ?? ""}" required />
+          <input type="text" id="item-name" value="${escapeHtml(item?.name ?? "")}" required />
         </div>
 
         <div class="field">
           <label for="item-name-ar">Name (Arabic) — optional</label>
-          <input type="text" id="item-name-ar" dir="rtl" value="${item?.name_ar ?? ""}" />
+          <input type="text" id="item-name-ar" dir="rtl" value="${escapeHtml(item?.name_ar ?? "")}" />
         </div>
 
         <div class="field">
           <label for="item-category">Category</label>
           <select id="item-category">
-            ${categories.map((c) => `<option value="${c.id}" ${c.id === item?.category_id ? "selected" : ""}>${c.name}</option>`).join("")}
+            ${categories.map((c) => `<option value="${c.id}" ${c.id === item?.category_id ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("")}
             <option value="__new__">+ New category…</option>
           </select>
         </div>
 
         <div class="field">
           <label for="item-description">Description (English)</label>
-          <textarea id="item-description" rows="3">${item?.description ?? ""}</textarea>
+          <textarea id="item-description" rows="3">${escapeHtml(item?.description ?? "")}</textarea>
         </div>
 
         <div class="field">
           <label for="item-description-ar">Description (Arabic)</label>
-          <textarea id="item-description-ar" dir="rtl" rows="3">${item?.description_ar ?? ""}</textarea>
+          <textarea id="item-description-ar" dir="rtl" rows="3">${escapeHtml(item?.description_ar ?? "")}</textarea>
         </div>
 
         <div class="field">
           <label for="item-ingredients">Ingredients (one per line)</label>
-          <textarea id="item-ingredients" rows="4" placeholder="Sesame bun&#10;Crisp lettuce&#10;Beef patty">${(item?.ingredients ?? []).join("\n")}</textarea>
+          <textarea id="item-ingredients" rows="4" placeholder="Sesame bun&#10;Crisp lettuce&#10;Beef patty">${escapeHtml((item?.ingredients ?? []).join("\n"))}</textarea>
         </div>
 
         <div class="field">
@@ -68,24 +68,24 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
 
         <div class="field">
           <label for="item-allergies">Allergies (English)</label>
-          <input type="text" id="item-allergies" placeholder="Nuts, Dairy, Gluten" value="${item?.allergies ?? ""}" />
+          <input type="text" id="item-allergies" placeholder="Nuts, Dairy, Gluten" value="${escapeHtml(item?.allergies ?? "")}" />
           <p class="field-hint">Comma-separated — shown on the customer site as a row of tags.</p>
         </div>
 
         <div class="field">
           <label for="item-allergies-ar">Allergies (Arabic)</label>
-          <input type="text" id="item-allergies-ar" dir="rtl" value="${item?.allergies_ar ?? ""}" />
+          <input type="text" id="item-allergies-ar" dir="rtl" value="${escapeHtml(item?.allergies_ar ?? "")}" />
         </div>
 
         <div class="field">
           <label for="item-featured-caption">Featured card text (English)</label>
-          <textarea id="item-featured-caption" rows="2">${item?.featured_caption ?? ""}</textarea>
+          <textarea id="item-featured-caption" rows="2">${escapeHtml(item?.featured_caption ?? "")}</textarea>
           <p class="field-hint">Shown on the customer site's home screen if this item is chosen as Featured in Settings. Leave blank to skip that card.</p>
         </div>
 
         <div class="field">
           <label for="item-featured-caption-ar">Featured card text (Arabic)</label>
-          <textarea id="item-featured-caption-ar" dir="rtl" rows="2">${item?.featured_caption_ar ?? ""}</textarea>
+          <textarea id="item-featured-caption-ar" dir="rtl" rows="2">${escapeHtml(item?.featured_caption_ar ?? "")}</textarea>
         </div>
 
         <div class="field">
@@ -192,7 +192,7 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
     const field = overlay.querySelector("#photo-field");
     field.innerHTML = `
       <div class="photo-preview" id="photo-preview">
-        ${photoPreviewUrl ? `<img src="${photoPreviewUrl}" alt="" />` : `<span>No photo yet</span>`}
+        ${photoPreviewUrl ? `<img src="${escapeHtml(photoPreviewUrl)}" alt="" />` : `<span>No photo yet</span>`}
         <label class="change-photo-button">
           📷 Change Photo
           <input type="file" accept="image/*" id="photo-input" hidden />
@@ -235,7 +235,7 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
             (group, gi) => `
           <div class="option-group-editor" data-group-index="${gi}">
             <div class="option-group-editor-header">
-              <span class="option-group-editor-name">${group.name}</span>
+              <span class="option-group-editor-name">${escapeHtml(group.name)}</span>
               <button type="button" class="link-button remove-option-group" data-group-index="${gi}">Remove group</button>
             </div>
             <div class="option-choice-chips">
@@ -243,8 +243,8 @@ export function renderEditItem(container, { supabase, restaurant, categories, it
                 .map(
                   (choice, ci) => `
                 <span class="option-choice-chip">
-                  ${choice}
-                  <button type="button" class="remove-choice-chip" data-group-index="${gi}" data-choice-index="${ci}" aria-label="Remove ${choice}">×</button>
+                  ${escapeHtml(choice)}
+                  <button type="button" class="remove-choice-chip" data-group-index="${gi}" data-choice-index="${ci}" aria-label="Remove ${escapeHtml(choice)}">×</button>
                 </span>
               `
                 )

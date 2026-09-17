@@ -3,21 +3,23 @@
 // cancelled/dismissed. Fields are required by default; pass
 // `required: false` on a field to allow it to be left blank.
 
+import { escapeHtml } from "@scanmenu/shared";
+
 export function promptModal({ title, fields, confirmText = "OK" }) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "prompt-modal-overlay";
     overlay.innerHTML = `
       <div class="prompt-modal">
-        <h3>${title}</h3>
+        <h3>${escapeHtml(title)}</h3>
         ${fields
           .map(
             (field) => `
-          <label for="prompt-modal-${field.id}">${field.label}</label>
+          <label for="prompt-modal-${field.id}">${escapeHtml(field.label)}</label>
           <input
             type="text"
             id="prompt-modal-${field.id}"
-            placeholder="${field.placeholder || ""}"
+            placeholder="${escapeHtml(field.placeholder || "")}"
             autocomplete="off"
             dir="${field.dir || "auto"}"
           />
@@ -27,7 +29,7 @@ export function promptModal({ title, fields, confirmText = "OK" }) {
           .join("")}
         <div class="prompt-modal-actions">
           <button type="button" class="secondary-button" id="prompt-modal-cancel">Cancel</button>
-          <button type="button" class="primary-button" id="prompt-modal-confirm">${confirmText}</button>
+          <button type="button" class="primary-button" id="prompt-modal-confirm">${escapeHtml(confirmText)}</button>
         </div>
       </div>
     `;

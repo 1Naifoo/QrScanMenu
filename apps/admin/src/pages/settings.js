@@ -11,6 +11,7 @@ import { confirmModal } from "../components/confirmModal.js";
 import { promptModal } from "../components/promptModal.js";
 import { showToast } from "../components/toast.js";
 import { t, getLanguage, setLanguage } from "../i18n/index.js";
+import { escapeHtml, safeUrl } from "@scanmenu/shared";
 
 const THEME_FIELDS = [
   { key: "background", labelKey: "settings.themeBackground" },
@@ -26,6 +27,10 @@ const THEME_FIELDS = [
 ];
 const THEME_FALLBACK = "#808080";
 
+// Returned as plain text — some callers set it via innerHTML (initial
+// render, must escape at that call site) and others via .textContent
+// (the live update on checkbox change, which must NOT be pre-escaped,
+// or entities would show up literally) — so this stays unescaped here.
 function featuredSummary(items, selectedIds) {
   if (selectedIds.length === 0) return "None (auto-pick)";
   const names = selectedIds.map((id) => items.find((i) => i.id === id)?.name).filter(Boolean);
@@ -117,15 +122,15 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
             <span class="login-logo-mark" aria-hidden="true"></span>
             <span>ScanMenu <strong>Admin</strong></span>
           </div>
-          ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${restaurant.logo_url}" alt="${restaurant.name}" /></div>` : ""}
-          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${restaurant.site_url}" target="_blank" rel="noopener">↗ View site</a>` : ""}
+          ${restaurant.logo_url ? `<div class="sidebar-restaurant-logo"><img src="${escapeHtml(restaurant.logo_url)}" alt="${escapeHtml(restaurant.name)}" /></div>` : ""}
+          ${restaurant.site_url ? `<a class="sidebar-site-link" href="${escapeHtml(safeUrl(restaurant.site_url))}" target="_blank" rel="noopener">↗ View site</a>` : ""}
           <div class="restaurant-switcher">
             <label for="restaurant-select">${t("sidebar.restaurant")}</label>
             <select id="restaurant-select">
               ${restaurants
                 .map(
                   (r) =>
-                    `<option value="${r.id}" ${r.id === state.restaurantId ? "selected" : ""}>${r.name}</option>`
+                    `<option value="${r.id}" ${r.id === state.restaurantId ? "selected" : ""}>${escapeHtml(r.name)}</option>`
                 )
                 .join("")}
             </select>
@@ -139,8 +144,8 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
             <button class="lang-option ${getLanguage() === "ar" ? "active" : ""}" data-lang="ar">العربية</button>
           </div>
           <div class="admin-account">
-            <span class="account-avatar">${session.user.email.charAt(0).toUpperCase()}</span>
-            <span class="account-email">${session.user.email}</span>
+            <span class="account-avatar">${escapeHtml(session.user.email.charAt(0).toUpperCase())}</span>
+            <span class="account-email">${escapeHtml(session.user.email)}</span>
             <button id="sign-out" class="link-button">${t("sidebar.signOut")}</button>
           </div>
         </aside>
@@ -159,7 +164,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
 
             <div class="field">
               <label for="restaurant-name">${t("settings.restaurantName")}</label>
-              <input type="text" id="restaurant-name" value="${restaurant.name}" required />
+              <input type="text" id="restaurant-name" value="${escapeHtml(restaurant.name)}" required />
             </div>
 
             <div class="field">
@@ -168,7 +173,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 type="url"
                 id="site-url"
                 placeholder="https://chino-cafe.vercel.app"
-                value="${restaurant.site_url || ""}"
+                value="${escapeHtml(restaurant.site_url || "")}"
               />
               <p class="field-hint">Your live customer-facing site's URL. Powers the "View site" link above and the QR code below.</p>
             </div>
@@ -181,7 +186,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                   : `
                 <details class="category-dropdown" id="featured-item-dropdown">
                   <summary class="category-dropdown-toggle">
-                    <span id="featured-item-summary">${featuredSummary(items, restaurant.featured_item_ids || [])}</span>
+                    <span id="featured-item-summary">${escapeHtml(featuredSummary(items, restaurant.featured_item_ids || []))}</span>
                     <span class="dropdown-chevron">⌄</span>
                   </summary>
                   <div class="category-dropdown-menu featured-item-menu">
@@ -192,7 +197,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                         <input type="checkbox" class="featured-item-checkbox" value="${i.id}" ${
                           (restaurant.featured_item_ids || []).includes(i.id) ? "checked" : ""
                         } />
-                        ${i.name}
+                        ${escapeHtml(i.name)}
                       </label>
                     `
                       )
@@ -210,7 +215,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 type="url"
                 id="deploy-webhook"
                 placeholder="https://api.vercel.com/v1/integrations/deploy/..."
-                value="${restaurant.deploy_webhook_url || ""}"
+                value="${escapeHtml(restaurant.deploy_webhook_url || "")}"
               />
               <p class="field-hint">${t("settings.deployHint")}</p>
             </div>
@@ -232,7 +237,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                   <input
                     type="color"
                     id="theme-${field.key}"
-                    value="${restaurant.theme?.[field.key] || THEME_FALLBACK}"
+                    value="${escapeHtml(restaurant.theme?.[field.key] || THEME_FALLBACK)}"
                     data-touched="${restaurant.theme?.[field.key] ? "true" : "false"}"
                   />
                 </div>
@@ -268,8 +273,8 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
                 .map(
                   (c) => `
                 <div class="category-translate-row" data-id="${c.id}">
-                  <input type="text" class="category-name-en" value="${c.name}" placeholder="${t("settings.categoryNameEn")}" />
-                  <input type="text" class="category-name-ar" dir="rtl" value="${c.name_ar ?? ""}" placeholder="${t("settings.categoryNameAr")}" />
+                  <input type="text" class="category-name-en" value="${escapeHtml(c.name)}" placeholder="${t("settings.categoryNameEn")}" />
+                  <input type="text" class="category-name-ar" dir="rtl" value="${escapeHtml(c.name_ar ?? "")}" placeholder="${t("settings.categoryNameAr")}" />
                   <label class="toggle-switch category-available-toggle" title="Shown on customer site">
                     <input type="checkbox" class="category-available" ${c.is_available !== false ? "checked" : ""} />
                     <span class="toggle-track"></span>
@@ -422,7 +427,7 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       <label>${t("settings.logo")}</label>
       <div class="logo-field-row">
         <div class="logo-preview" id="logo-preview">
-          ${logoPreviewUrl ? `<img src="${logoPreviewUrl}" alt="" />` : `<span>${t("settings.noLogo")}</span>`}
+          ${logoPreviewUrl ? `<img src="${escapeHtml(logoPreviewUrl)}" alt="" />` : `<span>${t("settings.noLogo")}</span>`}
         </div>
         <div class="logo-field-actions">
           <label class="secondary-button logo-upload-button">
@@ -472,10 +477,10 @@ export async function renderSettings(container, { supabase, session, onSignOut, 
       const printWindow = window.open("", "_blank");
       printWindow.document.write(`
         <html>
-          <head><title>${restaurant.name} — QR Code</title></head>
+          <head><title>${escapeHtml(restaurant.name)} — QR Code</title></head>
           <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;">
             <img src="${dataUrl}" alt="QR code" style="width:320px;height:320px;" />
-            <p style="margin-top:16px;font-size:18px;">${restaurant.name}</p>
+            <p style="margin-top:16px;font-size:18px;">${escapeHtml(restaurant.name)}</p>
           </body>
         </html>
       `);
