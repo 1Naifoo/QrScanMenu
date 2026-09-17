@@ -136,7 +136,7 @@ export function renderDishDetail(
     qtyValue.textContent = quantity;
   });
 
-  container.querySelectorAll(".option-choice").forEach((btn) => {
+  container.querySelectorAll(".option-choice:not(.option-choice-static)").forEach((btn) => {
     btn.addEventListener("click", () => {
       const group = btn.closest(".option-group");
       const groupName = group.dataset.group;
