@@ -149,6 +149,7 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
 
     container.querySelectorAll(".category-pill").forEach((pill) => {
       pill.addEventListener("click", () => {
+        container.querySelectorAll(".category-pill").forEach((p) => p.classList.toggle("active", p === pill));
         document.getElementById(pill.dataset.target)?.scrollIntoView({ behavior: "smooth" });
       });
     });
