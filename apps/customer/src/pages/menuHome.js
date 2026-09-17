@@ -56,27 +56,29 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
 
   function draw() {
     container.innerHTML = `
-      <header class="menu-header">
-        <div class="lang-switch">
-          <button class="lang-option ${getLanguage() === "en" ? "active" : ""}" data-lang="en">English</button>
-          <button class="lang-option ${getLanguage() === "ar" ? "active" : ""}" data-lang="ar">العربية</button>
-        </div>
-        ${restaurant.logoUrl ? `<img class="menu-logo" src="${escapeHtml(restaurant.logoUrl)}" alt="${escapeHtml(restaurant.name)}" />` : `<span class="menu-logo-text">${escapeHtml(restaurant.name)}</span>`}
-        <button class="my-list-shortcut" id="open-my-list">
-          <svg class="my-list-icon" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>
-          ${t("menu.myListButton")}
-          <span class="my-list-badge" id="my-list-badge">${getCount()}</span>
-        </button>
-      </header>
+      <div class="menu-sticky-top">
+        <header class="menu-header">
+          <div class="lang-switch">
+            <button class="lang-option ${getLanguage() === "en" ? "active" : ""}" data-lang="en">English</button>
+            <button class="lang-option ${getLanguage() === "ar" ? "active" : ""}" data-lang="ar">العربية</button>
+          </div>
+          ${restaurant.logoUrl ? `<img class="menu-logo" src="${escapeHtml(restaurant.logoUrl)}" alt="${escapeHtml(restaurant.name)}" />` : `<span class="menu-logo-text">${escapeHtml(restaurant.name)}</span>`}
+          <button class="my-list-shortcut" id="open-my-list">
+            <svg class="my-list-icon" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>
+            ${t("menu.myListButton")}
+            <span class="my-list-badge" id="my-list-badge">${getCount()}</span>
+          </button>
+        </header>
 
-      <nav class="category-pills">
-        ${categories
-          .map(
-            (c, i) =>
-              `<button class="category-pill ${i === 0 ? "active" : ""}" data-target="category-${c.id}" data-category-id="${c.id}">${escapeHtml(localize(c.name, c.name_ar))}</button>`
-          )
-          .join("")}
-      </nav>
+        <nav class="category-pills">
+          ${categories
+            .map(
+              (c, i) =>
+                `<button class="category-pill ${i === 0 ? "active" : ""}" data-target="category-${c.id}" data-category-id="${c.id}">${escapeHtml(localize(c.name, c.name_ar))}</button>`
+            )
+            .join("")}
+        </nav>
+      </div>
 
       <main class="menu-body">
         ${
@@ -140,6 +142,16 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
 
     enableDragScroll(container.querySelector("#featured-card-row"));
 
+    // The sticky header+pills bar sits on top of the scrolling content, so
+    // both the "jump to section" scroll target and the "which section is
+    // now visible" observer need to account for its real height — measured
+    // live rather than guessed, since it varies with logo size/font load.
+    const stickyTop = container.querySelector(".menu-sticky-top");
+    const stickyHeight = stickyTop?.offsetHeight || 100;
+    container.querySelectorAll(".category-section").forEach((section) => {
+      section.style.scrollMarginTop = `${stickyHeight}px`;
+    });
+
     container.querySelectorAll(".lang-option").forEach((btn) => {
       btn.addEventListener("click", () => {
         if (btn.dataset.lang === getLanguage()) return;
@@ -168,7 +180,7 @@ export function renderMenuHome(container, { menu, onOpenItem, onOpenMyList }) {
             pill.classList.toggle("active", pill.dataset.categoryId === visible.target.dataset.categoryId);
           });
         },
-        { rootMargin: "-96px 0px -70% 0px" }
+        { rootMargin: `-${stickyHeight}px 0px -70% 0px` }
       );
       sections.forEach((section) => observer.observe(section));
     }

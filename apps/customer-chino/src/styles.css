@@ -147,13 +147,21 @@ button {
 
 /* --- Page 1: Menu Home --- */
 
+.menu-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--c-background);
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+}
+
 .menu-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
   background: var(--c-surface);
-  border-radius: 0 0 20px 20px;
 }
 
 .lang-switch {
@@ -227,6 +235,7 @@ button {
   gap: 8px;
   overflow-x: auto;
   padding: 12px 16px;
+  background: var(--c-background);
   scrollbar-width: none;
 }
 
