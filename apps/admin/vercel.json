@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://pokucurfmdephvcpcged.supabase.co; connect-src 'self' https://pokucurfmdephvcpcged.supabase.co; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://pokucurfmdephvcpcged.supabase.co; connect-src 'self' https://pokucurfmdephvcpcged.supabase.co https://api.vercel.com https://api.netlify.com https://api.github.com; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
         },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
